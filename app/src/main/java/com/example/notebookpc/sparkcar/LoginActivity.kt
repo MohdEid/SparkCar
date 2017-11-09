@@ -2,13 +2,13 @@ package com.example.notebookpc.sparkcar
 
 import android.app.Activity
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.widget.Button
 import android.widget.Toast
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
-import java.util.*
+import kotlinx.android.synthetic.main.activity_login.*
 
 
 class LoginActivity : AppCompatActivity() {
@@ -35,6 +35,10 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this, "You're already signed in.", Toast.LENGTH_LONG).show()
 
             }
+        }
+
+        signOutButton.setOnClickListener {
+            AuthUI.getInstance().signOut(this)
         }
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

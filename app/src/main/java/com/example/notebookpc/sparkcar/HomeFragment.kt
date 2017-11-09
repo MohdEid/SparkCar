@@ -7,6 +7,9 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
 
 
 /**
@@ -17,7 +20,7 @@ import android.view.ViewGroup
  * Use the [HomeFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class HomeFragment : Fragment() {
+class HomeFragment : SupportMapFragment(), OnMapReadyCallback {
 
     // TODO: Rename and change types of parameters
     private var mParam1: String? = null
@@ -31,6 +34,12 @@ class HomeFragment : Fragment() {
             mParam1 = arguments.getString(ARG_PARAM1)
             mParam2 = arguments.getString(ARG_PARAM2)
         }
+
+        getMapAsync(this)
+    }
+
+    override fun onMapReady(p0: GoogleMap?) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,

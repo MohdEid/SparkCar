@@ -43,5 +43,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:11.4.2'
     implementation 'com.firebaseui:firebase-ui-auth:3.1.0'
     implementation 'com.facebook.android:facebook-login:4.27.0'
+
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinx_coroutines_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinx_coroutines_version"
 }
 apply plugin: 'com.google.gms.google-services'

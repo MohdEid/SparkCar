@@ -1,22 +1,20 @@
 package com.example.notebookpc.sparkcar
 
-import android.app.Dialog
-import android.support.v7.app.AppCompatActivity
+import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.NavigationView
-import android.support.v4.app.FragmentTransaction
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 
-class DrawerPage : AppCompatActivity(),NavigationView.OnNavigationItemSelectedListener {
+class DrawerPage : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, MessagesFragment.OnFragmentInteractionListener {
 
-    lateinit var drawerLayout:DrawerLayout
+    lateinit var drawerLayout: DrawerLayout
     lateinit var toolBar: Toolbar
-    lateinit var actionBarDrawerToggle:ActionBarDrawerToggle
-    lateinit var navigationView:NavigationView
-    lateinit var fragmentTransaction: FragmentTransaction
+    lateinit var actionBarDrawerToggle: ActionBarDrawerToggle
+    lateinit var navigationView: NavigationView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,78 +25,80 @@ class DrawerPage : AppCompatActivity(),NavigationView.OnNavigationItemSelectedLi
         drawerLayout = findViewById(R.id.drawer_layout)
         toolBar = findViewById(R.id.toolbar)
 
-        actionBarDrawerToggle = ActionBarDrawerToggle(this,drawerLayout, toolBar ,R.string.drawer_opened,R.string.drawer_closed)
+        actionBarDrawerToggle = ActionBarDrawerToggle(this, drawerLayout, toolBar, R.string.drawer_opened, R.string.drawer_closed)
         drawerLayout.addDrawerListener(actionBarDrawerToggle)
 
         navigationView = findViewById(R.id.navigation_view)
         navigationView.setNavigationItemSelectedListener(this)
-        }
+    }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
-        when(item.itemId){
-            R.id.id_home ->
-            fragmentTransaction = supportFragmentManager.beginTransaction()
-            fragmentTransaction.replace(R.id.main_container,HomeFragment()).commit()->
-                    supportActionBar!!.setTitle("Home Page")
+        when (item.itemId) {
+            R.id.id_home -> {
+                supportFragmentManager.beginTransaction()
+                        .replace(R.id.main_container, HomeFragment())
+                        .commit()
+                supportActionBar!!.title = "Home Page"
+            }
+            R.id.id_car -> {
+                supportFragmentManager.beginTransaction()
+                        .replace(R.id.main_container, CarsFragment())
+                        .commit()
+                supportActionBar!!.title = "Cars Page"
+            }
 
-            R.id.id_car ->
-                        fragmentTransaction = supportFragmentManager.beginTransaction()
-            fragmentTransaction.replace(R.id.main_container,CarsFragment())
-                    /*.addToBackStack("Home")*/
-                    .commit()->
-            supportActionBar!!.setTitle("Cars Page")
-        //item.setChecked(true)
-        //drawerLayout.closeDrawers()
-        //
-            R.id.id_messagse ->
-                fragmentTransaction = supportFragmentManager.beginTransaction()
-            fragmentTransaction.replace(R.id.main_container,MessagesFragment())
-                    /*.addToBackStack("Home")*/
-                    .commit()->
-                supportActionBar!!.setTitle("Messages Page")
+            R.id.id_messagse -> {
+                supportFragmentManager.beginTransaction()
+                        .replace(R.id.main_container, MessagesFragment())
+                        .commit()
+                supportActionBar!!.title = "Messages Page"
+            }
 
-            R.id.id_share ->
-                fragmentTransaction = supportFragmentManager.beginTransaction()
-            fragmentTransaction.replace(R.id.main_container,ShareFragment())
-                    /*.addToBackStack("Home")*/
-                    .commit()->
-                supportActionBar!!.setTitle("Share Page")
+            R.id.id_share -> {
+                supportFragmentManager.beginTransaction()
+                        .replace(R.id.main_container, ShareFragment())
+                        .commit()
+                supportActionBar!!.title = "Share Page"
+            }
 
-            R.id.id_favorite_cleaner ->
-                fragmentTransaction = supportFragmentManager.beginTransaction()
-            fragmentTransaction.replace(R.id.main_container,FavoritesFragment())
-                    /*.addToBackStack("Home")*/
-                    .commit()->
-                supportActionBar!!.setTitle("Favorite Cleaners Page")
+            R.id.id_favorite_cleaner -> {
+                supportFragmentManager.beginTransaction()
+                        .replace(R.id.main_container, FavoritesFragment())
+                        .commit()
+                supportActionBar!!.title = "Favorite Cleaners Page"
+            }
 
-            R.id.id_profile ->
-                fragmentTransaction = supportFragmentManager.beginTransaction()
-            fragmentTransaction.replace(R.id.main_container,ProfileFragment())
-                    /*.addToBackStack("Home")*/
-                    .commit()->
-                supportActionBar!!.setTitle("Profile Page")
+            R.id.id_profile -> {
+                supportFragmentManager.beginTransaction()
+                        .replace(R.id.main_container, ProfileFragment())
+                        .commit()
+                supportActionBar!!.title = "Profile Page"
+            }
+            R.id.id_about -> {
+                supportFragmentManager.beginTransaction()
+                        .replace(R.id.main_container, AboutFragment())
+                        .commit()
+                supportActionBar!!.title = "About Page"
+            }
 
-            R.id.id_about->
-                fragmentTransaction = supportFragmentManager.beginTransaction()
-            fragmentTransaction.replace(R.id.main_container,AboutFragment())
-                    /*.addToBackStack("Home")*/
-                    .commit()->
-                supportActionBar!!.setTitle("About Page")
-
-            R.id.id_settings ->
-                fragmentTransaction = supportFragmentManager.beginTransaction()
-            fragmentTransaction.replace(R.id.main_container, SettingsFragment())
-                    /*.addToBackStack("Home")*/
-                    .commit()->
-                supportActionBar!!.setTitle("Settings Page")
+            R.id.id_settings -> {
+                supportFragmentManager.beginTransaction()
+                        .replace(R.id.main_container, SettingsFragment())
+                        .commit()
+                supportActionBar!!.title = "Settings Page"
+            }
         }
         return true
     }
 
-     override fun onPostCreate(savedInstanceState: Bundle?) {
+    override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
         actionBarDrawerToggle.syncState()
+    }
+
+    override fun onFragmentInteraction(uri: Uri) {
+
     }
 
 }

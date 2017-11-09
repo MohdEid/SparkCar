@@ -7,3 +7,4 @@
 /build
 /captures
 .externalNativeBuild
+/SparkCar/app/src/debug/res/values/google_maps_api.xml
