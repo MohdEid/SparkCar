@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">SparkCar</string>
+    <string name="title_activity_maps">map</string>
+    <!-- ... -->
+    <string name="facebook_application_id" translatable="false">515832225450570</string>
+    <!-- Facebook Application ID, prefixed by 'fb'.  Enables Chrome Custom tabs. -->
+    <string name="facebook_login_protocol_scheme" translatable="false">fb515832225450570</string>
+    <string name="home">Home</string>
+    <string name="messages">Messages</string>
+    <string name="settings">Settings</string>
+    <string name="profile">Profile</string>
+    <string name="favorite_cleaner">Favorite Cleaner</string>
+    <string name="Location">Location</string>
+    <string name="cars">Cars</string>
+    <string name="about">About</string>
+    <string name="share">Share</string>
+    <string name="social">Social</string>
+    <string name="user_name_hunt">User Name</string>
+    <string name="user_profile_picture">User Profile picture</string>
+    <string name="user_phone_number">User Phone Number</string>
+    <string name="drawer_opened">Opened</string>
+    <string name="drawer_closed">Closed</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="Normal">Normal</string>
+    <string name="Satellite">Satellite</string>
+    <string name="terrain">Terrain</string>
+    <string name="hybrid">Hybrid</string>
+    <string name="none">None</string>
+</resources>

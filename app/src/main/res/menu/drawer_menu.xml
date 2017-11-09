@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/id_home"
+            android:title="@string/home"
+            android:icon="@drawable/ic_home_black_48dp" />
+        <item
+            android:id="@+id/id_messagse"
+            android:title="@string/messages"
+            android:icon="@drawable/ic_message_black_48dp"/>
+        <item
+            android:id="@+id/id_settings"
+            android:title="@string/settings"
+            android:icon="@drawable/ic_settings_black_48dp"/>
+        <item
+            android:id="@+id/id_profile"
+            android:title="@string/profile"
+            android:icon="@drawable/blank_image"/>
+        <item
+            android:id="@+id/id_favorite_cleaner"
+            android:title="@string/favorite_cleaner"
+            android:icon="@drawable/blank_image"/>
+        <item
+            android:id="@+id/id_location"
+            android:title="@string/Location"
+            android:icon="@drawable/blank_image"/>
+        <item
+            android:id="@+id/id_car"
+            android:title="@string/cars"
+            android:icon="@drawable/blank_image"/>
+    </group>
+<item android:title="@string/social">
+    <menu>
+        <item
+            android:id="@+id/id_about"
+            android:title="@string/about"
+            android:icon="@drawable/blank_image"/>
+        <item
+            android:id="@+id/id_share"
+            android:title="@string/share"/>
+    </menu>
+</item>
+</menu>
