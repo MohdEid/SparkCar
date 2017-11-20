@@ -6,6 +6,7 @@ import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresPermission
 import android.support.v4.app.ActivityCompat
@@ -29,6 +30,7 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 
 class MainActivity : FragmentActivity(), OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
     companion object {
         val LOG_TAG = MainActivity::class.java.simpleName
         private val REQUEST_LOCATION_CODE = 99
@@ -57,17 +59,16 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback, GoogleApiClient.Con
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        /* if(servicesOk()) {
-             if (initMap()) {
-                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                     checkLocationPermission()
-                 }
-                 buildGoogleApiClient()
-             }
-             else{
-                 Toast.makeText(this,"Map is not Connected",Toast.LENGTH_LONG).show()
-             }
-         }*/
+        if (servicesOk()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                checkLocationPermission()
+            }
+            buildGoogleApiClient()
+        }
+            else{
+                Toast.makeText(this, "Map is not Connected", Toast.LENGTH_LONG).show()
+            }
+
 
         locationReuqest = LocationRequest()
 
@@ -100,7 +101,6 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback, GoogleApiClient.Con
         fused.removeLocationUpdates(locationCallback)
     }
 
-    //    @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
 

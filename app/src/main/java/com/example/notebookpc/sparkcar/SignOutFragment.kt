@@ -7,20 +7,17 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
 
 
 /**
  * A simple [Fragment] subclass.
  * Activities that contain this fragment must implement the
- * [HomeFragment.OnFragmentInteractionListener] interface
+ * [SignOutFragment.OnFragmentInteractionListener] interface
  * to handle interaction events.
- * Use the [HomeFragment.newInstance] factory method to
+ * Use the [SignOutFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class HomeFragment : SupportMapFragment(), OnMapReadyCallback {
+class SignOutFragment : Fragment() {
 
     // TODO: Rename and change types of parameters
     private var mParam1: String? = null
@@ -34,18 +31,12 @@ class HomeFragment : SupportMapFragment(), OnMapReadyCallback {
             mParam1 = arguments.getString(ARG_PARAM1)
             mParam2 = arguments.getString(ARG_PARAM2)
         }
-
-        getMapAsync(this)
-    }
-
-    override fun onMapReady(p0: GoogleMap?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        return inflater!!.inflate(R.layout.fragment_home, container, false)
+        return inflater!!.inflate(R.layout.fragment_sign_out, container, false)
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -95,11 +86,11 @@ class HomeFragment : SupportMapFragment(), OnMapReadyCallback {
          *
          * @param param1 Parameter 1.
          * @param param2 Parameter 2.
-         * @return A new instance of fragment HomeFragment.
+         * @return A new instance of fragment SignOutFragment.
          */
         // TODO: Rename and change types and number of parameters
-        fun newInstance(param1: String, param2: String): HomeFragment {
-            val fragment = HomeFragment()
+        fun newInstance(param1: String, param2: String): SignOutFragment {
+            val fragment = SignOutFragment()
             val args = Bundle()
             args.putString(ARG_PARAM1, param1)
             args.putString(ARG_PARAM2, param2)

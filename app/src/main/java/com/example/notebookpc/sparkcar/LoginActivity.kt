@@ -18,6 +18,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
         val firebaseAuth= FirebaseAuth.getInstance()
         val button =findViewById<Button>(R.id.signInButton)
         button.setOnClickListener {
@@ -39,6 +40,7 @@ class LoginActivity : AppCompatActivity() {
 
         signOutButton.setOnClickListener {
             AuthUI.getInstance().signOut(this)
+            Toast.makeText(this,"Log-out succefully",Toast.LENGTH_LONG).show()
         }
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
