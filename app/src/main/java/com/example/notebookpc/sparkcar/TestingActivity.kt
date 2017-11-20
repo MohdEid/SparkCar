@@ -192,6 +192,7 @@ open class TestingActivity : AppCompatActivity(),
         }
     }
 
+    //calling variables of the cleaners database
     private data class Cleaners(
             val id: String = "",
             val location: Location,
