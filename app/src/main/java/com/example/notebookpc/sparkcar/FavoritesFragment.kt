@@ -8,18 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
-
-/**
- * A simple [Fragment] subclass.
- * Activities that contain this fragment must implement the
- * [FavoritesFragment.OnFragmentInteractionListener] interface
- * to handle interaction events.
- * Use the [FavoritesFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class FavoritesFragment : Fragment() {
-
-    // TODO: Rename and change types of parameters
 
 
     private var mListener: OnFragmentInteractionListener? = null
@@ -58,8 +47,8 @@ class FavoritesFragment : Fragment() {
 
     companion object {
 
-        fun newInstance(): HomeFragment {
-            val fragment = HomeFragment()
+        fun newInstance(): FavoritesFragment {
+            val fragment = FavoritesFragment()
             return fragment
         }
     }

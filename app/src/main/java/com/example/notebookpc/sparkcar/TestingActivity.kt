@@ -35,6 +35,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.database.*
+import java.util.*
 
 open class TestingActivity : AppCompatActivity(),
         OnMapReadyCallback,
@@ -61,6 +62,7 @@ open class TestingActivity : AppCompatActivity(),
     private lateinit var locationRequest: LocationRequest
     private lateinit var lastLocation: Location
     private var currentLocationMarker: Marker? = null
+    private var cleanerLocationMarker: Marker? = null
 
     private lateinit var fused: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
@@ -97,7 +99,6 @@ open class TestingActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_testing)
-
 
         initCleanersList()
 
@@ -166,6 +167,26 @@ open class TestingActivity : AppCompatActivity(),
             override fun onDataChange(dataSnapshot: DataSnapshot?) {
                 dataSnapshot!!.children.mapNotNullTo(cleaners) {
                     it.getValue<Cleaners>(Cleaners::class.java)
+
+                    locationCallback = object : LocationCallback() {
+                        override fun onLocationResult(location: LocationResult?) {
+                            super.onLocationResult(location)
+                            lastLocation = location?.lastLocation ?: return
+
+                            currentLocationMarker?.remove()
+
+                            val latLng = LatLng(cleaners[2].location.latitude, cleaners[2].location.longitude)
+
+                            val markerOptions = MarkerOptions()
+                            markerOptions.position(latLng)
+                            markerOptions.title(cleaners[1].id)
+                            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+
+                            cleanerLocationMarker = map.addMarker(markerOptions)
+
+                        }
+                    }
+                    return
                 }
             }
         }

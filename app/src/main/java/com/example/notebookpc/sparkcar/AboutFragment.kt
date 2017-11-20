@@ -57,8 +57,8 @@ class AboutFragment : Fragment() {
 
     companion object {
 
-        fun newInstance(): HomeFragment {
-            val fragment = HomeFragment()
+        fun newInstance(): AboutFragment {
+            val fragment = AboutFragment()
             return fragment
         }
     }

@@ -47,10 +47,8 @@ class ProfileFragment : Fragment() {
     }
 
     companion object {
-        // TODO: Rename parameter arguments, choose names that match
-
-        fun newInstance(): HomeFragment {
-            val fragment = HomeFragment()
+        fun newInstance(): ProfileFragment {
+            val fragment = ProfileFragment()
             return fragment
         }
     }
