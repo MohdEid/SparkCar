@@ -8,16 +8,16 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.net.Uri
 import android.os.Build
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.annotation.RequiresPermission
+import android.support.constraint.ConstraintLayout
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import com.firebase.ui.auth.AuthUI
@@ -37,10 +37,12 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.database.*
-import kotlinx.android.synthetic.main.activity_login.*
-import java.util.*
+import org.jetbrains.anko.*
 
-open class TestingActivity : AppCompatActivity(),
+typealias Id = String
+
+class TestingActivity : AppCompatActivity(),
+        AnkoLogger,
         OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -65,10 +67,28 @@ open class TestingActivity : AppCompatActivity(),
     private lateinit var locationRequest: LocationRequest
     private lateinit var lastLocation: Location
     private var currentLocationMarker: Marker? = null
-    private var cleanerLocationMarker: Marker? = null
+    private val cleanersMarkers = mutableMapOf<Id, Marker>()
 
     private lateinit var fused: FusedLocationProviderClient
-    private lateinit var locationCallback: LocationCallback
+    private val locationCallback: LocationCallback = object : LocationCallback() {
+        override fun onLocationResult(location: LocationResult?) {
+            super.onLocationResult(location)
+            lastLocation = location?.lastLocation ?: return
+
+            currentLocationMarker?.remove()
+
+
+            val latLng = LatLng(lastLocation.latitude, lastLocation.longitude)
+
+            val markerOptions = MarkerOptions()
+            markerOptions.position(latLng)
+            markerOptions.title("home")
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+
+            currentLocationMarker = map.addMarker(markerOptions)
+            debug("current location: $latLng")
+        }
+    }
 
 
     private lateinit var dialog: Dialog
@@ -92,19 +112,13 @@ open class TestingActivity : AppCompatActivity(),
 
 
     //Firebase Initialization
-    lateinit var ref: DatabaseReference
-    lateinit var cleanerMarker: DatabaseReference
-    lateinit var lat: Location
-    lateinit var lon: Location
+    private val ref: DatabaseReference = FirebaseDatabase.getInstance().reference.child("cleaners")
 
-
-    private val cleaners: MutableList<Cleaners> = mutableListOf()
+    private val cleaners: MutableList<Cleaner> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_testing)
-
-        initCleanersList()
 
         //instantiating NavigationDrawer
         drawerLayout = findViewById(R.id.drawer_layout)
@@ -142,87 +156,76 @@ open class TestingActivity : AppCompatActivity(),
         locationRequest.fastestInterval = 5000
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 
-        locationCallback = object : LocationCallback() {
-            override fun onLocationResult(location: LocationResult?) {
-                super.onLocationResult(location)
-                lastLocation = location?.lastLocation ?: return
+    }
 
-                currentLocationMarker?.remove()
+    /**
+     * Removes cleaner by id
+     */
+    private fun removeCleaner(cleaner: Cleaner) {
+        cleaners.removeAll { it.id == cleaner.id }
+        cleanersMarkers[cleaner.id]?.remove() ?: throw AssertionError()
+        cleanersMarkers.remove(cleaner.id)
 
+        info("removed marker at position: ${cleaner.location}")
+    }
 
-                val latLng = LatLng(lastLocation.latitude, lastLocation.longitude)
+    private fun addCleaner(cleaner: Cleaner) {
+        cleaners.add(cleaner)
+        val marker = map.addMarker(MarkerOptions()
+                .position(cleaner.location)
+                .title(cleaner.name)
+                .snippet("Mobile: ${cleaner.mobile} \nRating: ${cleaner.rating}")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)))
+        marker.tag = CleanerTag(cleaner.name, "Mobile: ${cleaner.mobile}", rating = cleaner.rating)
+        cleanersMarkers.put(cleaner.id, marker)
 
-                val markerOptions = MarkerOptions()
-                markerOptions.position(latLng)
-                markerOptions.title("home")
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+        info("added marker at position: ${cleaner.location}")
+    }
 
-                currentLocationMarker = map.addMarker(markerOptions)
+    private fun moveCleaner(cleaner: Cleaner) {
+        cleaners.removeAll { it.id == cleaner.id }
+        cleaners.add(cleaner)
+        val marker1 = cleanersMarkers[cleaner.id]
+        marker1?.apply {
+            position = cleaner.location
+            title = cleaner.name
+            snippet = "Mobile: ${cleaner.mobile} \nRating: ${cleaner.rating}"
+            tag = CleanerTag(cleaner.name, "Mobile: ${cleaner.mobile}", rating = cleaner.rating)
+            if (isInfoWindowShown) {
+                hideInfoWindow()
+                showInfoWindow()
             }
         }
     }
 
-    private fun initCleanersList() {
-        val cleanersListener = object : ValueEventListener {
-            override fun onCancelled(p0: DatabaseError?) {
-
-            }
-
-            override fun onDataChange(dataSnapshot: DataSnapshot?) {
-                dataSnapshot!!.children.mapNotNullTo(cleaners) {
-                    it.getValue<Cleaners>(Cleaners::class.java)
-
-                    locationCallback = object : LocationCallback() {
-                        override fun onLocationResult(location: LocationResult?) {
-                            super.onLocationResult(location)
-                            lastLocation = location?.lastLocation ?: return
-
-                            currentLocationMarker?.remove()
-
-                            val latLng = LatLng(cleaners[2].location.latitude, cleaners[2].location.longitude)
-
-                            val markerOptions = MarkerOptions()
-                            markerOptions.position(latLng)
-                            markerOptions.title(cleaners[1].id)
-                            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-
-                            cleanerLocationMarker = map.addMarker(markerOptions)
-
-                        }
-                    }
-                    return
-                }
-            }
-        }
-    }
 
     //calling variables of the cleaners database
-    private data class Cleaners(
-            val id: String = "",
-            val location: Location,
+    private data class Cleaner(
+            val id: Id = "",
+            val location: LatLng,
             val mobile: String = "",
             val name: String = "",
-            val Rating: String = ""
-    )
+            val rating: Float = 0.0f
+    ) {
+        companion object {
+            fun newCleaner(dataSnapshot: DataSnapshot?): Cleaner {
+                val snapshot = dataSnapshot ?: throw AssertionError("Null child added to database")
+                val id = snapshot.child("id").getValue(Id::class.java) ?: throw AssertionError("child not expected to be null")
+                val lat = snapshot.child("location/lat").getValue(Double::class.java) ?: throw AssertionError("child not expected to be null")
+                val lon = snapshot.child("location/lon").getValue(Double::class.java) ?: throw AssertionError("child not expected to be null")
+                val location = LatLng(lat, lon)
+                val name = snapshot.child("name").getValue(String::class.java) ?: throw AssertionError("child not expected to be null")
+                val mobile = snapshot.child("mobile").getValue(String::class.java) ?: throw AssertionError("child not expected to be null")
+                val rating = snapshot.child("rating").getValue(Float::class.java) ?: throw AssertionError("child not expected to be null")
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_main,menu)
-        return true
+                return Cleaner(id = id, name = name, location = location, mobile = mobile, rating = rating)
+            }
+        }
     }
 
-    //TODO need to make sure the user is signed in before showing the menu option
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-       when(item.itemId)
-       {
-           R.id.id_sign_out ->{
-               signOutButton.setOnClickListener {
-                   AuthUI.getInstance().signOut(this)
-                   Toast.makeText(this,"Log-out succefully",Toast.LENGTH_LONG).show()
-               }
-           }
-       }
-        return true
-    }
+    data class CleanerTag(val title: String,
+                          val message: String,
+                          val rating: Float)
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
@@ -252,7 +255,7 @@ open class TestingActivity : AppCompatActivity(),
                 supportFragmentManager.beginTransaction()
                         .replace(R.id.main_container, favoritesFragment)
                         .commit()
-                supportActionBar!!.title = "Favorite Cleaners Page"
+                supportActionBar!!.title = "Favorite Cleaner Page"
             }
             R.id.id_location -> {
                 supportFragmentManager.beginTransaction()
@@ -277,6 +280,10 @@ open class TestingActivity : AppCompatActivity(),
                         .replace(R.id.main_container, shareFragment)
                         .commit()
                 supportActionBar!!.title = "Share Page"
+            }
+            R.id.id_sign_out -> {
+                AuthUI.getInstance().signOut(this)
+                longToast("Log-out succefully")
             }
         }
         return true
@@ -305,6 +312,43 @@ open class TestingActivity : AppCompatActivity(),
             enableMyLocation()
         }
 
+        val cleanersListener = object : ChildEventListener {
+            override fun onCancelled(dataSnapshot: DatabaseError?) {
+            }
+
+            override fun onChildMoved(dataSnapshot: DataSnapshot?, p1: String?) {
+            }
+
+            override fun onChildChanged(dataSnapshot: DataSnapshot?, p1: String?) {
+                val cleaner = Cleaner.newCleaner(dataSnapshot)
+                moveCleaner(cleaner)
+            }
+
+            override fun onChildAdded(snapshot: DataSnapshot?, p1: String?) {
+                val cleaner = Cleaner.newCleaner(snapshot)
+                addCleaner(cleaner)
+
+                info("cleaner added: ${cleaner.name}")
+            }
+
+            override fun onChildRemoved(dataSnapshot: DataSnapshot?) {
+                val cleaner = Cleaner.newCleaner(dataSnapshot)
+                removeCleaner(cleaner)
+
+                info("cleaner removed: ${cleaner.name}")
+            }
+        }
+        ref.addChildEventListener(cleanersListener)
+
+        map.setOnInfoWindowClickListener { marker ->
+            alert {
+                customView {
+                    include<ConstraintLayout>(R.layout.cleaner_info_layout)
+                }
+                positiveButton("Request Cleaner") {}
+                negativeButton("Cancel") {}
+            }.show()
+        }
     }
 
     private fun checkLocationSetting() {
@@ -345,7 +389,7 @@ open class TestingActivity : AppCompatActivity(),
                 dialog = GoogleApiAvailability.getInstance().getErrorDialog(this, isAvailable, TestingActivity.REQUEST_LOCATION_CODE)
                 dialog.show()
             }
-            else -> Toast.makeText(this, "Can't connect to mapping services", Toast.LENGTH_LONG).show()
+            else -> longToast("Can't connect to mapping services")
         }
         return false
     }

@@ -36,6 +36,9 @@
             <item
                 android:id="@+id/id_share"
                 android:title="@string/share" />
+            <item
+                android:id="@+id/id_sign_out"
+                android:title="@string/sign_out"/>
         </menu>
     </item>
 </menu>
