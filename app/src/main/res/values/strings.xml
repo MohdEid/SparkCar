@@ -31,4 +31,8 @@
     <string name="hybrid">Hybrid</string>
     <string name="none">None</string>
     <string name="sign_out">sign out</string>
+    <string name="sign_in">Sign In</string>
+    <string name="first_name">First Name</string>
+    <string name="share_this_at">Share this at :</string>
+    <string name="this_is_test_application_for_the_client_side">This is test application for the client side.</string>
 </resources>

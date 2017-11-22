@@ -17,8 +17,10 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.Toolbar
+import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.ApiException
@@ -35,6 +37,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.database.*
+import kotlinx.android.synthetic.main.activity_login.*
 import java.util.*
 
 open class TestingActivity : AppCompatActivity(),
@@ -86,6 +89,7 @@ open class TestingActivity : AppCompatActivity(),
     private val aboutFragment = AboutFragment.newInstance()
     private val favoritesFragment = FavoritesFragment.newInstance()
     private val locationFragment = LocationFragment.newInstance()
+    private val signOutFragment= SignOutFragment.newInstance()
 
     //Firebase Initialization
     lateinit var ref: DatabaseReference
@@ -201,6 +205,24 @@ open class TestingActivity : AppCompatActivity(),
             val Rating: String = ""
     )
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main,menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+       when(item.itemId)
+       {
+           R.id.id_sign_out ->{
+               signOutButton.setOnClickListener {
+                   AuthUI.getInstance().signOut(this)
+                   Toast.makeText(this,"Log-out succefully",Toast.LENGTH_LONG).show()
+               }
+           }
+       }
+        return true
+    }
+
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
         drawerLayout.closeDrawers()
@@ -249,6 +271,12 @@ open class TestingActivity : AppCompatActivity(),
                 supportActionBar!!.title = "About Page"
             }
             R.id.id_share -> {
+                supportFragmentManager.beginTransaction()
+                        .replace(R.id.main_container, shareFragment)
+                        .commit()
+                supportActionBar!!.title = "Share Page"
+            }
+            R.id.id_sign_out -> {
                 supportFragmentManager.beginTransaction()
                         .replace(R.id.main_container, shareFragment)
                         .commit()

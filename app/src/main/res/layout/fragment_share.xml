@@ -1,4 +1,4 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -6,8 +6,37 @@
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:id="@+id/txtViewShare"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="169dp"
+        android:text="@string/share_this_at" />
 
-</FrameLayout>
+    <Button
+        android:id="@+id/btnFacebook"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtViewShare"
+        android:layout_toStartOf="@+id/txtViewShare"
+        android:text="FB" />
+
+    <Button
+        android:id="@+id/btnWhatsapp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/btnFacebook"
+        android:layout_alignBottom="@+id/btnFacebook"
+        android:layout_centerHorizontal="true"
+        android:text="Whatsapp" />
+
+    <Button
+        android:id="@+id/btnPhone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/btnWhatsapp"
+        android:layout_toEndOf="@+id/txtViewShare"
+        android:text="Phone" />
+
+</RelativeLayout>

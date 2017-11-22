@@ -48,7 +48,6 @@
                 android:id="@+id/id_sign_out"
                 android:title="@string/sign_out"
                 />
-
         </menu>
     </item>
 </menu>
