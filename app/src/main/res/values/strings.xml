@@ -23,7 +23,6 @@
     <string name="drawer_opened">Opened</string>
     <string name="drawer_closed">Closed</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="Normal">Normal</string>
     <string name="Satellite">Satellite</string>
@@ -35,4 +34,7 @@
     <string name="first_name">First Name</string>
     <string name="share_this_at">Share this at :</string>
     <string name="this_is_test_application_for_the_client_side">This is test application for the client side.</string>
+    <string name="fb">FB</string>
+    <string name="whatsapp">Whatsapp</string>
+    <string name="phone">Phone</string>
 </resources>

@@ -53,15 +53,10 @@
                 <data android:scheme="@string/facebook_login_protocol_scheme" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".MapsActivity"
-            android:label="@string/title_activity_maps">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.notebookpc.sparkcar.MainActivity" />
-        </activity>
+
+
         <activity android:name=".LoginActivity" />
-        <activity android:name=".DrawerPage" />
+
         <activity android:name=".MainActivity" />
     </application>
 

@@ -55,8 +55,8 @@ open class TestingActivity : AppCompatActivity(),
         ShareFragment.OnFragmentInteractionListener {
 
     companion object {
-        private val REQUEST_LOCATION_CODE = 99
-        private val REQUEST_CODE_LOCATION_SETTINGS: Int = 100
+        val REQUEST_LOCATION_CODE = 99
+        val REQUEST_CODE_LOCATION_SETTINGS: Int = 100
     }
 
     //GoogleMaps Initialization
@@ -89,7 +89,7 @@ open class TestingActivity : AppCompatActivity(),
     private val aboutFragment = AboutFragment.newInstance()
     private val favoritesFragment = FavoritesFragment.newInstance()
     private val locationFragment = LocationFragment.newInstance()
-    private val signOutFragment= SignOutFragment.newInstance()
+
 
     //Firebase Initialization
     lateinit var ref: DatabaseReference
@@ -210,6 +210,7 @@ open class TestingActivity : AppCompatActivity(),
         return true
     }
 
+    //TODO need to make sure the user is signed in before showing the menu option
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
        when(item.itemId)
        {
@@ -233,6 +234,7 @@ open class TestingActivity : AppCompatActivity(),
                         .replace(R.id.main_container, messagesFragment)
                         .commit()
                 supportActionBar!!.title = "Messages Page"
+                supportActionBar!!.setDisplayHomeAsUpEnabled(true)
             }
             R.id.id_settings -> {
                 supportFragmentManager.beginTransaction()
@@ -271,12 +273,6 @@ open class TestingActivity : AppCompatActivity(),
                 supportActionBar!!.title = "About Page"
             }
             R.id.id_share -> {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_container, shareFragment)
-                        .commit()
-                supportActionBar!!.title = "Share Page"
-            }
-            R.id.id_sign_out -> {
                 supportFragmentManager.beginTransaction()
                         .replace(R.id.main_container, shareFragment)
                         .commit()
