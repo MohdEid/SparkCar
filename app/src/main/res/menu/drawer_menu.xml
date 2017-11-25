@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
-
         <item
             android:id="@+id/id_home"
             android:icon="@drawable/ic_home_black_48dp"
@@ -36,9 +35,9 @@
             <item
                 android:id="@+id/id_share"
                 android:title="@string/share" />
-            <item
-                android:id="@+id/id_sign_out"
-                android:title="@string/sign_out"/>
         </menu>
     </item>
+    <item
+        android:id="@+id/id_sign_out"
+        android:title="@string/sign_out" />
 </menu>

@@ -36,6 +36,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import org.jetbrains.anko.*
 
@@ -59,6 +60,7 @@ class TestingActivity : AppCompatActivity(),
     companion object {
         val REQUEST_LOCATION_CODE = 99
         val REQUEST_CODE_LOCATION_SETTINGS: Int = 100
+        var RC_SIGN_IN: Int = 123
     }
 
     //GoogleMaps Initialization
@@ -110,6 +112,7 @@ class TestingActivity : AppCompatActivity(),
     private val favoritesFragment = FavoritesFragment.newInstance()
     private val locationFragment = LocationFragment.newInstance()
 
+    //    private val item: MenuItem = (R.id.id_sign_out) as MenuItem
 
     //Firebase Initialization
     private val ref: DatabaseReference = FirebaseDatabase.getInstance().reference.child("cleaners")
@@ -119,6 +122,16 @@ class TestingActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_testing)
+
+        //TODO fix visibility of sign out in the menu
+//        if (client.isConnected) {
+//
+//            item.isVisible = false
+//            this.invalidateOptionsMenu()
+//        } else {
+//            item.isVisible = true
+//            this.invalidateOptionsMenu()
+//        }
 
         //instantiating NavigationDrawer
         drawerLayout = findViewById(R.id.drawer_layout)
@@ -130,9 +143,7 @@ class TestingActivity : AppCompatActivity(),
         navigationView = findViewById(R.id.navigation_view)
         navigationView.setNavigationItemSelectedListener(this)
 
-
         fused = LocationServices.getFusedLocationProviderClient(this)
-
 
         val mapFragment = SupportMapFragment()
         supportFragmentManager.beginTransaction()
@@ -148,7 +159,6 @@ class TestingActivity : AppCompatActivity(),
         } else {
             Toast.makeText(this, "Map is not Connected", Toast.LENGTH_LONG).show()
         }
-
 
         locationRequest = LocationRequest()
 
@@ -166,7 +176,6 @@ class TestingActivity : AppCompatActivity(),
         cleanersMarkers[cleaner.id]?.remove() ?: throw AssertionError()
         cleanersMarkers.remove(cleaner.id)
 
-        info("removed marker at position: ${cleaner.location}")
     }
 
     private fun addCleaner(cleaner: Cleaner) {
@@ -179,7 +188,6 @@ class TestingActivity : AppCompatActivity(),
         marker.tag = CleanerTag(cleaner.name, "Mobile: ${cleaner.mobile}", rating = cleaner.rating)
         cleanersMarkers.put(cleaner.id, marker)
 
-        info("added marker at position: ${cleaner.location}")
     }
 
     private fun moveCleaner(cleaner: Cleaner) {
@@ -189,7 +197,10 @@ class TestingActivity : AppCompatActivity(),
         marker1?.apply {
             position = cleaner.location
             title = cleaner.name
+
+            //TODO replace Mobile number with distance, and Rating to numerical
             snippet = "Mobile: ${cleaner.mobile} \nRating: ${cleaner.rating}"
+
             tag = CleanerTag(cleaner.name, "Mobile: ${cleaner.mobile}", rating = cleaner.rating)
             if (isInfoWindowShown) {
                 hideInfoWindow()
@@ -227,17 +238,22 @@ class TestingActivity : AppCompatActivity(),
                           val message: String,
                           val rating: Float)
 
+    //TODO check if its possible to move this to different class, to be called again
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
         drawerLayout.closeDrawers()
 
         when (item.itemId) {
+        //sends back to main activity
+            R.id.id_home -> {
+                startActivity<TestingActivity>()
+            }
             R.id.id_messagse -> {
                 supportFragmentManager.beginTransaction()
                         .replace(R.id.main_container, messagesFragment)
                         .commit()
                 supportActionBar!!.title = "Messages Page"
-                supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+
             }
             R.id.id_settings -> {
                 supportFragmentManager.beginTransaction()
@@ -281,9 +297,11 @@ class TestingActivity : AppCompatActivity(),
                         .commit()
                 supportActionBar!!.title = "Share Page"
             }
+        //TODO need to make this visible only if the user is signed in
+        //sign out
             R.id.id_sign_out -> {
                 AuthUI.getInstance().signOut(this)
-                longToast("Log-out succefully")
+                longToast("Logging out successfully")
             }
         }
         return true
@@ -312,6 +330,16 @@ class TestingActivity : AppCompatActivity(),
             enableMyLocation()
         }
 
+        //add markers on the map
+
+        //TODO add custom marker and save it to database
+        /*val options = MarkerOptions()
+                .title("Custom Location")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
+                .position( LatLng())
+                        map.addMarker()*/
+
+        //adds cleaners markers from database to the map
         val cleanersListener = object : ChildEventListener {
             override fun onCancelled(dataSnapshot: DatabaseError?) {
             }
@@ -327,29 +355,47 @@ class TestingActivity : AppCompatActivity(),
             override fun onChildAdded(snapshot: DataSnapshot?, p1: String?) {
                 val cleaner = Cleaner.newCleaner(snapshot)
                 addCleaner(cleaner)
-
-                info("cleaner added: ${cleaner.name}")
             }
 
             override fun onChildRemoved(dataSnapshot: DataSnapshot?) {
                 val cleaner = Cleaner.newCleaner(dataSnapshot)
                 removeCleaner(cleaner)
 
-                info("cleaner removed: ${cleaner.name}")
             }
         }
         ref.addChildEventListener(cleanersListener)
 
-        map.setOnInfoWindowClickListener { marker ->
+        map.setOnInfoWindowClickListener {
             alert {
+                //                val dataSnapShot:DataSnapshot?
+//                val cleaner =Cleaner.newCleaner(dataSnapShot)
+                //TODO add cleaner name to the title
+                title = "This is a cleaner"
                 customView {
-                    include<ConstraintLayout>(R.layout.cleaner_info_layout)
+                    include<ConstraintLayout>(R.layout.custom_dialog)
+//                    txtMobileNumber.text= cleaners[2].toString()
                 }
-                positiveButton("Request Cleaner") {}
+                positiveButton("Request Cleaner") {
+
+                    val firebaseAuth = FirebaseAuth.getInstance()
+                    if (firebaseAuth.currentUser == null) {
+                        val signInIntent = AuthUI.getInstance().createSignInIntentBuilder().setAvailableProviders(
+                                listOf(AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
+                                        AuthUI.IdpConfig.Builder(AuthUI.PHONE_VERIFICATION_PROVIDER).build(),
+                                        AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build(),
+                                        AuthUI.IdpConfig.Builder(AuthUI.FACEBOOK_PROVIDER).build()))
+                                .setIsSmartLockEnabled(!BuildConfig.DEBUG)
+                                .build()
+                        startActivityForResult(signInIntent, RC_SIGN_IN)
+                    } else {
+                        startActivity<OrdersActivity>()
+                    }
+                }
                 negativeButton("Cancel") {}
             }.show()
         }
     }
+
 
     private fun checkLocationSetting() {
         val locationSettingsBuilder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
@@ -422,7 +468,7 @@ class TestingActivity : AppCompatActivity(),
                         enableMyLocation()
                     }
                 } else {
-                    Toast.makeText(this, "something went wrong", Toast.LENGTH_LONG).show()
+                    longToast("something went wrong")
                 }
                 return
             }
