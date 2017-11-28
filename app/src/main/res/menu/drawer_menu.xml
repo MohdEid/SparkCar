@@ -4,40 +4,40 @@
         <item
             android:id="@+id/id_home"
             android:icon="@drawable/ic_home_black_48dp"
-            android:title="@string/home" />
+            android:title="@string/home"/>
         <item
             android:id="@+id/id_messagse"
             android:icon="@drawable/ic_message_black_48dp"
-            android:title="@string/messages" />
+            android:title="@string/messages"/>
         <item
             android:id="@+id/id_settings"
             android:icon="@drawable/ic_settings_black_48dp"
-            android:title="@string/settings" />
+            android:title="@string/settings"/>
         <item
             android:id="@+id/id_profile"
-            android:title="@string/profile" />
+            android:title="@string/profile"/>
         <item
             android:id="@+id/id_favorite_cleaner"
-            android:title="@string/favorite_cleaner" />
+            android:title="@string/favorite_cleaner"/>
         <item
             android:id="@+id/id_location"
-            android:title="@string/Location" />
+            android:title="@string/Location"/>
         <item
             android:id="@+id/id_car"
-            android:title="@string/cars" />
+            android:title="@string/cars"/>
     </group>
     <item android:title="@string/social">
         <menu>
             <item
                 android:id="@+id/id_about"
                 android:icon="@drawable/blank_image"
-                android:title="@string/about" />
+                android:title="@string/about"/>
             <item
                 android:id="@+id/id_share"
-                android:title="@string/share" />
+                android:title="@string/share"/>
         </menu>
     </item>
     <item
         android:id="@+id/id_sign_out"
-        android:title="@string/sign_out" />
+        android:title="@string/sign_out"/>
 </menu>

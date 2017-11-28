@@ -67,7 +67,7 @@ class TestingActivity : AppCompatActivity(),
     private lateinit var map: GoogleMap
     private lateinit var client: GoogleApiClient
     private lateinit var locationRequest: LocationRequest
-    private lateinit var lastLocation: Location
+    private var lastLocation: Location? = null
     private var currentLocationMarker: Marker? = null
     private val cleanersMarkers = mutableMapOf<Id, Marker>()
 
@@ -75,11 +75,10 @@ class TestingActivity : AppCompatActivity(),
     private val locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(location: LocationResult?) {
             super.onLocationResult(location)
-            lastLocation = location?.lastLocation ?: return
 
             currentLocationMarker?.remove()
 
-
+            val lastLocation = lastLocation ?: return
             val latLng = LatLng(lastLocation.latitude, lastLocation.longitude)
 
             val markerOptions = MarkerOptions()
@@ -102,36 +101,16 @@ class TestingActivity : AppCompatActivity(),
     private lateinit var navigationView: NavigationView
 
 
-    //fragments Initializing
-    private val messagesFragment = MessagesFragment.newInstance()
-    private val settingsFragment = SettingsFragment.newInstance()
-    private val shareFragment = ShareFragment.newInstance()
-    private val profileFragment = ProfileFragment.newInstance()
-    private val carsFragment = CarsFragment.newInstance()
-    private val aboutFragment = AboutFragment.newInstance()
-    private val favoritesFragment = FavoritesFragment.newInstance()
-    private val locationFragment = LocationFragment.newInstance()
-
-    //    private val item: MenuItem = (R.id.id_sign_out) as MenuItem
-
     //Firebase Initialization
     private val ref: DatabaseReference = FirebaseDatabase.getInstance().reference.child("cleaners")
+    private val firebaseAuth = FirebaseAuth.getInstance()
+
 
     private val cleaners: MutableList<Cleaner> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_testing)
-
-        //TODO fix visibility of sign out in the menu
-//        if (client.isConnected) {
-//
-//            item.isVisible = false
-//            this.invalidateOptionsMenu()
-//        } else {
-//            item.isVisible = true
-//            this.invalidateOptionsMenu()
-//        }
 
         //instantiating NavigationDrawer
         drawerLayout = findViewById(R.id.drawer_layout)
@@ -142,6 +121,8 @@ class TestingActivity : AppCompatActivity(),
 
         navigationView = findViewById(R.id.navigation_view)
         navigationView.setNavigationItemSelectedListener(this)
+
+        updateSignOutItem()
 
         fused = LocationServices.getFusedLocationProviderClient(this)
 
@@ -166,6 +147,20 @@ class TestingActivity : AppCompatActivity(),
         locationRequest.fastestInterval = 5000
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 
+        firebaseAuth.addAuthStateListener {
+            updateSignOutItem()
+        }
+    }
+
+    private fun updateSignOutItem() {
+        val item = navigationView.menu.findItem(R.id.id_sign_out)
+        if (firebaseAuth.currentUser != null) {
+            item.isVisible = true
+            this.invalidateOptionsMenu()
+        } else {
+            item.isVisible = false
+            this.invalidateOptionsMenu()
+        }
     }
 
     /**
@@ -183,9 +178,9 @@ class TestingActivity : AppCompatActivity(),
         val marker = map.addMarker(MarkerOptions()
                 .position(cleaner.location)
                 .title(cleaner.name)
-                .snippet("Mobile: ${cleaner.mobile} \nRating: ${cleaner.rating}")
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)))
-        marker.tag = CleanerTag(cleaner.name, "Mobile: ${cleaner.mobile}", rating = cleaner.rating)
+        marker.snippet = createSnippet(marker)
+        marker.tag = CleanerTag(cleaner.name, createSnippet(marker), rating = cleaner.rating)
         cleanersMarkers.put(cleaner.id, marker)
 
     }
@@ -198,8 +193,7 @@ class TestingActivity : AppCompatActivity(),
             position = cleaner.location
             title = cleaner.name
 
-            //TODO replace Mobile number with distance, and Rating to numerical
-            snippet = "Mobile: ${cleaner.mobile} \nRating: ${cleaner.rating}"
+            snippet = createSnippet(this)
 
             tag = CleanerTag(cleaner.name, "Mobile: ${cleaner.mobile}", rating = cleaner.rating)
             if (isInfoWindowShown) {
@@ -207,6 +201,19 @@ class TestingActivity : AppCompatActivity(),
                 showInfoWindow()
             }
         }
+    }
+
+    private fun createSnippet(marker: Marker): String {
+        val lastLocation = lastLocation ?: return ""
+        val cleanerTag = marker.tag as? CleanerTag ?: return ""
+        val distance: Int = calculateDistance(marker.position, LatLng(lastLocation.latitude, lastLocation.longitude)).toInt()
+        return "${distance / 1000}km    ${cleanerTag.rating.toInt()}/5"
+    }
+
+    private fun calculateDistance(start: LatLng, end: LatLng): Float {
+        val result = floatArrayOf(0.0f)
+        Location.distanceBetween(start.latitude, start.longitude, end.latitude, end.longitude, result)
+        return result[0]
     }
 
 
@@ -238,72 +245,12 @@ class TestingActivity : AppCompatActivity(),
                           val message: String,
                           val rating: Float)
 
-    //TODO check if its possible to move this to different class, to be called again
+
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
         drawerLayout.closeDrawers()
 
-        when (item.itemId) {
-        //sends back to main activity
-            R.id.id_home -> {
-                startActivity<TestingActivity>()
-            }
-            R.id.id_messagse -> {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_container, messagesFragment)
-                        .commit()
-                supportActionBar!!.title = "Messages Page"
-
-            }
-            R.id.id_settings -> {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_container, settingsFragment)
-                        .commit()
-                supportActionBar!!.title = "Settings Page"
-            }
-            R.id.id_profile -> {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_container, profileFragment)
-                        .commit()
-                supportActionBar!!.title = "Profile Page"
-            }
-            R.id.id_favorite_cleaner -> {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_container, favoritesFragment)
-                        .commit()
-                supportActionBar!!.title = "Favorite Cleaner Page"
-            }
-            R.id.id_location -> {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_container, locationFragment)
-                        .commit()
-                supportActionBar!!.title = "Location Page"
-            }
-            R.id.id_car -> {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_container, carsFragment)
-                        .commit()
-                supportActionBar!!.title = "Cars Page"
-            }
-            R.id.id_about -> {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_container, aboutFragment)
-                        .commit()
-                supportActionBar!!.title = "About Page"
-            }
-            R.id.id_share -> {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_container, shareFragment)
-                        .commit()
-                supportActionBar!!.title = "Share Page"
-            }
-        //TODO need to make this visible only if the user is signed in
-        //sign out
-            R.id.id_sign_out -> {
-                AuthUI.getInstance().signOut(this)
-                longToast("Logging out successfully")
-            }
-        }
+        selectNavigationItem(item)
         return true
     }
 
@@ -332,12 +279,6 @@ class TestingActivity : AppCompatActivity(),
 
         //add markers on the map
 
-        //TODO add custom marker and save it to database
-        /*val options = MarkerOptions()
-                .title("Custom Location")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
-                .position( LatLng())
-                        map.addMarker()*/
 
         //adds cleaners markers from database to the map
         val cleanersListener = object : ChildEventListener {
@@ -360,24 +301,20 @@ class TestingActivity : AppCompatActivity(),
             override fun onChildRemoved(dataSnapshot: DataSnapshot?) {
                 val cleaner = Cleaner.newCleaner(dataSnapshot)
                 removeCleaner(cleaner)
-
             }
         }
         ref.addChildEventListener(cleanersListener)
 
-        map.setOnInfoWindowClickListener {
+        map.setOnInfoWindowClickListener { marker: Marker? ->
             alert {
-                //                val dataSnapShot:DataSnapshot?
-//                val cleaner =Cleaner.newCleaner(dataSnapShot)
-                //TODO add cleaner name to the title
-                title = "This is a cleaner"
+                val cleanerTag = marker?.tag as? CleanerTag ?: return@alert
+                title = cleanerTag.title
                 customView {
                     include<ConstraintLayout>(R.layout.custom_dialog)
 //                    txtMobileNumber.text= cleaners[2].toString()
                 }
                 positiveButton("Request Cleaner") {
 
-                    val firebaseAuth = FirebaseAuth.getInstance()
                     if (firebaseAuth.currentUser == null) {
                         val signInIntent = AuthUI.getInstance().createSignInIntentBuilder().setAvailableProviders(
                                 listOf(AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
@@ -393,6 +330,10 @@ class TestingActivity : AppCompatActivity(),
                 }
                 negativeButton("Cancel") {}
             }.show()
+        }
+        map.setOnMarkerClickListener { marker ->
+            marker.snippet = createSnippet(marker)
+            false
         }
     }
 
@@ -418,8 +359,8 @@ class TestingActivity : AppCompatActivity(),
     private fun enableMyLocation() {
         map.isMyLocationEnabled = true
         fused.lastLocation.addOnSuccessListener {
-            val location = it ?: return@addOnSuccessListener
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude), 13f))
+            lastLocation = it ?: return@addOnSuccessListener
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lastLocation!!.latitude, lastLocation!!.longitude), 13f))
         }
 
         fused.requestLocationUpdates(locationRequest, locationCallback, null)
