@@ -17,9 +17,10 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import android.widget.Toast
+import com.example.notebookpc.sparkcar.data.Cleaner
+import com.example.notebookpc.sparkcar.data.Customer
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -96,13 +97,13 @@ class TestingActivity : AppCompatActivity(),
 
     //Navigation Drawer Initialization
     private lateinit var drawerLayout: DrawerLayout
-    private lateinit var toolBar: Toolbar
     private lateinit var actionBarDrawerToggle: ActionBarDrawerToggle
     private lateinit var navigationView: NavigationView
 
 
     //Firebase Initialization
-    private val ref: DatabaseReference = FirebaseDatabase.getInstance().reference.child("cleaners")
+    private val cleanersReference: DatabaseReference = FirebaseDatabase.getInstance().reference.child("cleaners")
+    private val customersReference: DatabaseReference = FirebaseDatabase.getInstance().reference.child("customers")
     private val firebaseAuth = FirebaseAuth.getInstance()
 
 
@@ -114,9 +115,8 @@ class TestingActivity : AppCompatActivity(),
 
         //instantiating NavigationDrawer
         drawerLayout = findViewById(R.id.drawer_layout)
-        toolBar = findViewById(R.id.toolbar)
 
-        actionBarDrawerToggle = ActionBarDrawerToggle(this, drawerLayout, toolBar, R.string.drawer_opened, R.string.drawer_closed)
+        actionBarDrawerToggle = ActionBarDrawerToggle(this, drawerLayout, null, R.string.drawer_opened, R.string.drawer_closed)
         drawerLayout.addDrawerListener(actionBarDrawerToggle)
 
         navigationView = findViewById(R.id.navigation_view)
@@ -216,31 +216,6 @@ class TestingActivity : AppCompatActivity(),
         return result[0]
     }
 
-
-    //calling variables of the cleaners database
-    private data class Cleaner(
-            val id: Id = "",
-            val location: LatLng,
-            val mobile: String = "",
-            val name: String = "",
-            val rating: Float = 0.0f
-    ) {
-        companion object {
-            fun newCleaner(dataSnapshot: DataSnapshot?): Cleaner {
-                val snapshot = dataSnapshot ?: throw AssertionError("Null child added to database")
-                val id = snapshot.child("id").getValue(Id::class.java) ?: throw AssertionError("child not expected to be null")
-                val lat = snapshot.child("location/lat").getValue(Double::class.java) ?: throw AssertionError("child not expected to be null")
-                val lon = snapshot.child("location/lon").getValue(Double::class.java) ?: throw AssertionError("child not expected to be null")
-                val location = LatLng(lat, lon)
-                val name = snapshot.child("name").getValue(String::class.java) ?: throw AssertionError("child not expected to be null")
-                val mobile = snapshot.child("mobile").getValue(String::class.java) ?: throw AssertionError("child not expected to be null")
-                val rating = snapshot.child("rating").getValue(Float::class.java) ?: throw AssertionError("child not expected to be null")
-
-                return Cleaner(id = id, name = name, location = location, mobile = mobile, rating = rating)
-            }
-        }
-    }
-
     data class CleanerTag(val title: String,
                           val message: String,
                           val rating: Float)
@@ -303,7 +278,7 @@ class TestingActivity : AppCompatActivity(),
                 removeCleaner(cleaner)
             }
         }
-        ref.addChildEventListener(cleanersListener)
+        cleanersReference.addChildEventListener(cleanersListener)
 
         map.setOnInfoWindowClickListener { marker: Marker? ->
             alert {
@@ -431,9 +406,32 @@ class TestingActivity : AppCompatActivity(),
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
-            TestingActivity.REQUEST_CODE_LOCATION_SETTINGS -> {
+            REQUEST_CODE_LOCATION_SETTINGS -> {
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     enableMyLocation()
+                }
+            }
+
+            RC_SIGN_IN -> {
+                if (resultCode == RESULT_OK) {
+                    // TODO get the id of the current user and check if the user is already in the database
+                    val uid = "uid"
+                    customersReference.orderByChild("id").equalTo(uid).limitToFirst(1).addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onCancelled(p0: DatabaseError?) {
+                            toast("Error: ${p0.toString()}")
+                            info("Customer not found in database")
+                        }
+
+                        override fun onDataChange(p0: DataSnapshot?) {
+                            info("snapshot: $p0")
+                            for (snapshot in p0?.children ?: return) {
+                                val customer = Customer.newCustomer(snapshot)
+                                info("Customer signed in: $customer")
+                            }
+                        }
+                    })
+                } else {
+                    toast("Sign in failed. Please try again")
                 }
             }
         }
