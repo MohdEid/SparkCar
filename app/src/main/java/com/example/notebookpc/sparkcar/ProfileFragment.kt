@@ -7,7 +7,10 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
+import android.widget.Button
+import android.widget.TextView
+import com.google.firebase.database.FirebaseDatabase
+import org.jetbrains.anko.support.v4.find
 
 
 class ProfileFragment : Fragment() {
@@ -15,16 +18,39 @@ class ProfileFragment : Fragment() {
 
     private var mListener: OnFragmentInteractionListener? = null
 
+    //declaration of layout variables
+    private lateinit var txtName: TextView
+    private lateinit var txtEmail: TextView
+    private lateinit var txtPhone: TextView
+    private lateinit var currentPW: TextView
+    private lateinit var btnSave: Button
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         return inflater!!.inflate(R.layout.fragment_profile, container, false)
+
+        //TODO find a way to read the view from layout
+
+        txtEmail = find(R.id.editEmailAdress)
+        txtName = find(R.id.editFirstName)
+        txtPhone = find(R.id.editPhoneNumber)
+        currentPW = find(R.id.editCurPw)
+        btnSave = find(R.id.btnSave)
     }
 
-    fun onButtonPressed(uri: Uri) {
-        if (mListener != null) {
-            mListener!!.onFragmentInteraction(uri)
-        }
+    private fun toMap(): Map<String, Any> {
+        val map = mutableMapOf<String, Any>()
+
+        map.put("name", txtName)
+        map.put("email", txtEmail)
+        map.put("mobile", txtPhone)
+
+        return map
+    }
+
+    fun pushUser(user: ProfileFragment) {
+        FirebaseDatabase.getInstance().getReference("/customers").push().setValue(user.toMap())
     }
 
     override fun onAttach(context: Context?) {
@@ -48,8 +74,7 @@ class ProfileFragment : Fragment() {
 
     companion object {
         fun newInstance(): ProfileFragment {
-            val fragment = ProfileFragment()
-            return fragment
+            return ProfileFragment()
         }
     }
-}// Required empty public constructor
+}

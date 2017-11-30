@@ -113,6 +113,10 @@ class TestingActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_testing)
 
+        //TODO remove this when done fixing signing in
+        if (firebaseAuth.currentUser != null) {
+            AuthUI.getInstance().signOut(this)
+        }
         //instantiating NavigationDrawer
         drawerLayout = findViewById(R.id.drawer_layout)
 
@@ -415,18 +419,29 @@ class TestingActivity : AppCompatActivity(),
             RC_SIGN_IN -> {
                 if (resultCode == RESULT_OK) {
                     // TODO get the id of the current user and check if the user is already in the database
-                    val uid = "uid"
+                    val uid = FirebaseAuth.getInstance().currentUser?.uid
                     customersReference.orderByChild("id").equalTo(uid).limitToFirst(1).addListenerForSingleValueEvent(object : ValueEventListener {
+                        // customersReference.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onCancelled(p0: DatabaseError?) {
                             toast("Error: ${p0.toString()}")
                             info("Customer not found in database")
                         }
 
-                        override fun onDataChange(p0: DataSnapshot?) {
-                            info("snapshot: $p0")
-                            for (snapshot in p0?.children ?: return) {
+                        override fun onDataChange(snapshot: DataSnapshot?) {
+                            //checks if uid exists in database
+                            info(snapshot)
+                            for (dataSnapshot in snapshot?.children ?: return) {
+                                //TODO fix problems passing data to the class
                                 val customer = Customer.newCustomer(snapshot)
-                                info("Customer signed in: $customer")
+                                info("Customer ID is :$customer")
+                                if (customer.id == uid) {
+                                    info("Customer signed in")
+                                } else {
+                                    supportFragmentManager.beginTransaction()
+                                            .replace(R.id.main_container, Fragments.profileFragment)
+                                            .commit()
+                                    supportActionBar!!.title = "Profile Page"
+                                }
                             }
                         }
                     })
