@@ -130,12 +130,14 @@ class TestingActivity : AppCompatActivity(),
 
         fused = LocationServices.getFusedLocationProviderClient(this)
 
+        //adds map fragment to main activity
         val mapFragment = SupportMapFragment()
         supportFragmentManager.beginTransaction()
                 .replace(R.id.main_container, mapFragment)
                 .commit()
         mapFragment.getMapAsync(this)
 
+        //checks if build version of sdk is recent
         if (servicesOk()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 checkLocationPermission()
@@ -145,6 +147,7 @@ class TestingActivity : AppCompatActivity(),
             Toast.makeText(this, "Map is not Connected", Toast.LENGTH_LONG).show()
         }
 
+        //requests the location of user
         locationRequest = LocationRequest()
 
         locationRequest.interval = 5000
@@ -156,6 +159,7 @@ class TestingActivity : AppCompatActivity(),
         }
     }
 
+    //updates the visibility of sign out in the menu when the user is signed in or not
     private fun updateSignOutItem() {
         val item = navigationView.menu.findItem(R.id.id_sign_out)
         if (firebaseAuth.currentUser != null) {
@@ -177,6 +181,7 @@ class TestingActivity : AppCompatActivity(),
 
     }
 
+    //adds cleaner marker to the map
     private fun addCleaner(cleaner: Cleaner) {
         cleaners.add(cleaner)
         val marker = map.addMarker(MarkerOptions()
@@ -189,6 +194,8 @@ class TestingActivity : AppCompatActivity(),
 
     }
 
+    /**
+     * This function tracks the location of cleaner when they move*/
     private fun moveCleaner(cleaner: Cleaner) {
         cleaners.removeAll { it.id == cleaner.id }
         cleaners.add(cleaner)
@@ -284,6 +291,7 @@ class TestingActivity : AppCompatActivity(),
         }
         cleanersReference.addChildEventListener(cleanersListener)
 
+        //sets listener on the window of marker of a cleaner
         map.setOnInfoWindowClickListener { marker: Marker? ->
             alert {
                 val cleanerTag = marker?.tag as? CleanerTag ?: return@alert
@@ -294,7 +302,9 @@ class TestingActivity : AppCompatActivity(),
                 }
                 positiveButton("Request Cleaner") {
 
+                    //verifies if there is a user signed in or not
                     if (firebaseAuth.currentUser == null) {
+                        //starts an intent to sign in or sign up
                         val signInIntent = AuthUI.getInstance().createSignInIntentBuilder().setAvailableProviders(
                                 listOf(AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
                                         AuthUI.IdpConfig.Builder(AuthUI.PHONE_VERIFICATION_PROVIDER).build(),
@@ -304,6 +314,7 @@ class TestingActivity : AppCompatActivity(),
                                 .build()
                         startActivityForResult(signInIntent, RC_SIGN_IN)
                     } else {
+                        //loads the activity when the user is present
                         startActivity<OrdersActivity>()
                     }
                 }
@@ -317,6 +328,7 @@ class TestingActivity : AppCompatActivity(),
     }
 
 
+    //validates if Location Services is enabled in the device or not
     private fun checkLocationSetting() {
         val locationSettingsBuilder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
         val task = LocationServices
@@ -333,6 +345,7 @@ class TestingActivity : AppCompatActivity(),
 
     }
 
+    //shows your current location
     @RequiresPermission(value = Manifest.permission.ACCESS_FINE_LOCATION)
     @SuppressLint("MissingPermission")
     private fun enableMyLocation() {
@@ -345,6 +358,7 @@ class TestingActivity : AppCompatActivity(),
         fused.requestLocationUpdates(locationRequest, locationCallback, null)
     }
 
+    //checks if the device has recent google play services or not
     private fun servicesOk(): Boolean {
 
         val isAvailable: Int = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this)
@@ -360,6 +374,7 @@ class TestingActivity : AppCompatActivity(),
         return false
     }
 
+    //instantiate google map
     @Synchronized private fun buildGoogleApiClient() {
         client = GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -379,16 +394,16 @@ class TestingActivity : AppCompatActivity(),
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        //checks if permissions granted to access GPS or not
         when (requestCode) {
             TestingActivity.REQUEST_LOCATION_CODE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                         buildGoogleApiClient()
-
                         enableMyLocation()
                     }
                 } else {
-                    longToast("something went wrong")
+                    longToast("Something went wrong")
                 }
                 return
             }
@@ -410,6 +425,7 @@ class TestingActivity : AppCompatActivity(),
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
+        //validates permissions to use map
             REQUEST_CODE_LOCATION_SETTINGS -> {
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     enableMyLocation()
@@ -417,34 +433,39 @@ class TestingActivity : AppCompatActivity(),
             }
 
             RC_SIGN_IN -> {
+                //checks if result from sign is success
                 if (resultCode == RESULT_OK) {
                     // TODO get the id of the current user and check if the user is already in the database
                     val uid = FirebaseAuth.getInstance().currentUser?.uid
-                    customersReference.orderByChild("id").equalTo(uid).limitToFirst(1).addListenerForSingleValueEvent(object : ValueEventListener {
-                        // customersReference.addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onCancelled(p0: DatabaseError?) {
-                            toast("Error: ${p0.toString()}")
-                            info("Customer not found in database")
-                        }
-
-                        override fun onDataChange(snapshot: DataSnapshot?) {
-                            //checks if uid exists in database
-                            info(snapshot)
-                            for (dataSnapshot in snapshot?.children ?: return) {
-                                //TODO fix problems passing data to the class
-                                val customer = Customer.newCustomer(snapshot)
-                                info("Customer ID is :$customer")
-                                if (customer.id == uid) {
-                                    info("Customer signed in")
-                                } else {
-                                    supportFragmentManager.beginTransaction()
-                                            .replace(R.id.main_container, Fragments.profileFragment)
-                                            .commit()
-                                    supportActionBar!!.title = "Profile Page"
+                    customersReference.orderByChild("id").equalTo(uid).limitToFirst(1)
+                            .addListenerForSingleValueEvent(object : ValueEventListener {
+                                // customersReference.addListenerForSingleValueEvent(object : ValueEventListener {
+                                override fun onCancelled(p0: DatabaseError?) {
+                                    toast("Error: ${p0.toString()}")
+                                    info("Customer not found in database")
                                 }
-                            }
-                        }
-                    })
+
+                                override fun onDataChange(snapshot: DataSnapshot?) {
+                                    //checks if uid exists in database
+                                    info(snapshot)
+                                    //Reads all data from database and initialize them in customers class
+                                    for (item in snapshot?.children ?: return) {
+                                        var customer = Customer.newCustomer(item)
+                                        //checks if its a new sign in or exists from FirebaseAuth
+                                        //TODO verify if all entries not empty in database, if not then user must enter them in profile page
+                                        if (customer.id == uid) {
+                                            longToast("Customer signed in")
+
+                                        } else {
+                                            longToast("New user")
+                                            supportFragmentManager.beginTransaction()
+                                                    .replace(R.id.main_container, Fragments.profileFragment)
+                                                    .commit()
+                                            supportActionBar!!.title = "Profile Page"
+                                        }
+                                    }
+                                }
+                            })
                 } else {
                     toast("Sign in failed. Please try again")
                 }

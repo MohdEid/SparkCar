@@ -8,20 +8,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
-
-/**
- * A simple [Fragment] subclass.
- * Activities that contain this fragment must implement the
- * [CarsFragment.OnFragmentInteractionListener] interface
- * to handle interaction events.
- * Use the [CarsFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class CarsFragment : Fragment() {
 
 
     private var mListener: OnFragmentInteractionListener? = null
 
+    //TODO need to add dropdown list for cars, and view other details of which car to clean
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -29,11 +21,7 @@ class CarsFragment : Fragment() {
     }
 
 
-    fun onButtonPressed(uri: Uri) {
-        if (mListener != null) {
-            mListener!!.onFragmentInteraction(uri)
-        }
-    }
+
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
@@ -58,8 +46,7 @@ class CarsFragment : Fragment() {
     companion object {
 
         fun newInstance(): CarsFragment {
-            val fragment = CarsFragment()
-            return fragment
+            return CarsFragment()
         }
     }
 }// Required empty public constructor

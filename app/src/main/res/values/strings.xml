@@ -37,5 +37,9 @@
     <string name="fb">FB</string>
     <string name="whatsapp">Whatsapp</string>
     <string name="phone">Phone</string>
-    <string name="mobile_number">Mobile Number</string>
+    <string name="mobile_number">Mobile Number:</string>
+    <string name="show">Show</string>
+    <string name="name">Name:</string>
+    <string name="car_plate">Car Plate</string>
+    <string name="car_color">Car Color:</string>
 </resources>

@@ -1,12 +1,91 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             tools:context="com.example.notebookpc.sparkcar.CarsFragment">
+    android:orientation="vertical"
+    tools:context="com.example.notebookpc.sparkcar.CarsFragment">
 
 
-    <ListView
-        android:id="@+id/listCars"
+    <TextView
+        android:id="@+id/txtCarName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/name" />
+
+    <EditText
+        android:id="@+id/editCarName"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-</FrameLayout>
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/editCarPlate"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:labelFor="@+id/txtCarName" />
+
+    <EditText
+        android:id="@+id/editCarPlate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editCarName"
+        android:layout_marginStart="15dp"
+        android:layout_toEndOf="@+id/txtCarPlate"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:labelFor="@+id/txtCarPlate" />
+
+    <TextView
+        android:id="@+id/txtCarPlate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/editCarPlate"
+        android:layout_alignEnd="@+id/txtCarName"
+        android:layout_marginBottom="12dp"
+        android:text="@string/car_plate" />
+
+    <TextView
+        android:id="@+id/txtColor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/txtCarPlate"
+        android:layout_marginTop="20dp"
+        android:text="@string/car_color" />
+
+    <EditText
+        android:id="@+id/editCarColor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/editCarPlate"
+        android:layout_below="@+id/editCarPlate"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:labelFor="@+id/editCarColor" />
+
+    <Button
+        android:id="@+id/btnSave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="12dp"
+        android:layout_toEndOf="@+id/btnReturn"
+        android:text="Save" />
+
+    <Button
+        android:id="@+id/btnReturn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/btnSave"
+        android:layout_alignBottom="@+id/btnSave"
+        android:layout_centerHorizontal="true"
+        android:text="Restore" />
+
+    <Button
+        android:id="@+id/btnDelete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/btnReturn"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="41dp"
+        android:text="Delete" />
+
+</RelativeLayout>
