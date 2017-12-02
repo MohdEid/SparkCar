@@ -9,7 +9,8 @@ data class Cleaner(
         val mobile: String,
         val name: String,
         val email: String,
-        val rating: Float = 0.0f
+        val rating: Float = 0.0f,
+        val isAvailable: Boolean
 ) {
     companion object {
         fun newCleaner(dataSnapshot: DataSnapshot?): Cleaner {
@@ -22,8 +23,9 @@ data class Cleaner(
             val mobile = snapshot.child("mobile").getValue(String::class.java) ?: throw AssertionError("child not expected to be null")
             val rating = snapshot.child("rating").getValue(Float::class.java) ?: throw AssertionError("child not expected to be null")
             val email = snapshot.child("email").getValue(String::class.java) ?: throw AssertionError("child not expected to be null")
+            val available = snapshot.child("is_available").getValue(Boolean::class.java) ?: false
 
-            return Cleaner(id = id, name = name, location = location, mobile = mobile, rating = rating, email = email)
+            return Cleaner(id = id, name = name, location = location, mobile = mobile, rating = rating, email = email, isAvailable = available)
         }
     }
 }

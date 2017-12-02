@@ -3,7 +3,6 @@ package com.example.notebookpc.sparkcar
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.ListView
-import org.jetbrains.anko.find
 
 class OrdersActivity : AppCompatActivity() {
 
@@ -13,6 +12,6 @@ class OrdersActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_orders)
 
-        listView = find(R.id.listv)
+//        listView = find(R.id.)
     }
 }

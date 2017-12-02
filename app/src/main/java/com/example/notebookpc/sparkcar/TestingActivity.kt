@@ -13,6 +13,7 @@ import android.support.annotation.RequiresPermission
 import android.support.constraint.ConstraintLayout
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
@@ -52,7 +53,7 @@ class TestingActivity : AppCompatActivity(),
         MessagesFragment.OnFragmentInteractionListener,
         SettingsFragment.OnFragmentInteractionListener,
         ProfileFragment.OnFragmentInteractionListener,
-        FavoritesFragment.OnFragmentInteractionListener,
+        FavoriteCleanersFragment.OnFragmentInteractionListener,
         LocationFragment.OnFragmentInteractionListener,
         CarsFragment.OnFragmentInteractionListener,
         AboutFragment.OnFragmentInteractionListener,
@@ -63,6 +64,15 @@ class TestingActivity : AppCompatActivity(),
         val REQUEST_CODE_LOCATION_SETTINGS: Int = 100
         var RC_SIGN_IN: Int = 123
     }
+
+    internal val messagesFragment = MessagesFragment.newInstance()
+    internal val settingsFragment = SettingsFragment.newInstance()
+    internal val shareFragment = ShareFragment.newInstance()
+    internal val profileFragment = ProfileFragment.newInstance()
+    internal val carsFragment = CarsFragment.newInstance()
+    internal val aboutFragment = AboutFragment.newInstance()
+    internal val favoriteCleanersFragment: Fragment = FavoriteCleanersFragment.newInstance()
+    internal val locationFragment = LocationFragment.newInstance()
 
     //GoogleMaps Initialization
     private lateinit var map: GoogleMap
@@ -435,8 +445,8 @@ class TestingActivity : AppCompatActivity(),
             RC_SIGN_IN -> {
                 //checks if result from sign is success
                 if (resultCode == RESULT_OK) {
-                    // TODO get the id of the current user and check if the user is already in the database
-                    val uid = FirebaseAuth.getInstance().currentUser?.uid
+                    //get the id of the current user and check if the user is already in the database
+                    val uid = FirebaseAuth.getInstance().currentUser?.uid ?: throw AssertionError("User should be signed in in this part")
                     customersReference.orderByChild("id").equalTo(uid).limitToFirst(1)
                             .addListenerForSingleValueEvent(object : ValueEventListener {
                                 // customersReference.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -450,16 +460,16 @@ class TestingActivity : AppCompatActivity(),
                                     info(snapshot)
                                     //Reads all data from database and initialize them in customers class
                                     for (item in snapshot?.children ?: return) {
-                                        var customer = Customer.newCustomer(item)
+                                        val customer = Customer.newCustomer(item)
                                         //checks if its a new sign in or exists from FirebaseAuth
                                         //TODO verify if all entries not empty in database, if not then user must enter them in profile page
                                         if (customer.id == uid) {
                                             longToast("Customer signed in")
-
+                                            CustomerHolder.customer = customer
                                         } else {
                                             longToast("New user")
                                             supportFragmentManager.beginTransaction()
-                                                    .replace(R.id.main_container, Fragments.profileFragment)
+                                                    .replace(R.id.main_container, profileFragment)
                                                     .commit()
                                             supportActionBar!!.title = "Profile Page"
                                         }

@@ -25,13 +25,14 @@ class ProfileFragment : Fragment() {
     private lateinit var currentPW: TextView
     private lateinit var btnSave: Button
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        return inflater!!.inflate(R.layout.fragment_profile, container, false)
+        return inflater.inflate(R.layout.fragment_profile, container, false)
+    }
 
-        //TODO find a way to read the view from layout
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         txtEmail = find(R.id.editEmailAdress)
         txtName = find(R.id.editFirstName)
         txtPhone = find(R.id.editPhoneNumber)

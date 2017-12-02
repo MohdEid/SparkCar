@@ -14,10 +14,10 @@ class CarsFragment : Fragment() {
     private var mListener: OnFragmentInteractionListener? = null
 
     //TODO need to add dropdown list for cars, and view other details of which car to clean
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        return inflater!!.inflate(R.layout.fragment_cars, container, false)
+        return inflater.inflate(R.layout.fragment_cars, container, false)
     }
 
 

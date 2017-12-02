@@ -11,9 +11,9 @@ class SettingsFragment : Fragment() {
 
     private var mListener: OnFragmentInteractionListener? = null
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? =// Inflate the layout for this fragment
-            inflater!!.inflate(R.layout.fragment_setting, container, false)
+            inflater.inflate(R.layout.fragment_setting, container, false)
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)

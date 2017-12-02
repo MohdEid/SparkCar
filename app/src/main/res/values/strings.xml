@@ -42,4 +42,8 @@
     <string name="name">Name:</string>
     <string name="car_plate">Car Plate</string>
     <string name="car_color">Car Color:</string>
+
+    <string name="favorite_cleaner_list_item_name">Name: %s</string>
+    <string name="favorite_cleaner_list_item_rating">Rating: %f</string>
+    <string name="favorite_cleaner_list_item_availability">Available: %b</string>
 </resources>

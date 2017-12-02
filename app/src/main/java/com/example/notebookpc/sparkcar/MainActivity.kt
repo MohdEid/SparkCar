@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity(),
         MessagesFragment.OnFragmentInteractionListener,
         SettingsFragment.OnFragmentInteractionListener,
         ProfileFragment.OnFragmentInteractionListener,
-        FavoritesFragment.OnFragmentInteractionListener,
+        FavoriteCleanersFragment.OnFragmentInteractionListener,
         LocationFragment.OnFragmentInteractionListener,
         CarsFragment.OnFragmentInteractionListener,
         AboutFragment.OnFragmentInteractionListener,
@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity(),
     private val profileFragment = ProfileFragment.newInstance()
     private val carsFragment = CarsFragment.newInstance()
     private val aboutFragment = AboutFragment.newInstance()
-    private val favoritesFragment = FavoritesFragment.newInstance()
+    //    private val favoritesFragment = FavoriteCleanersFragment.newInstance()
     private val locationFragment = LocationFragment.newInstance()
 
     //    private val item: MenuItem = (R.id.id_sign_out) as MenuItem
@@ -265,12 +265,12 @@ class MainActivity : AppCompatActivity(),
                         .commit()
                 supportActionBar!!.title = "Profile Page"
             }
-            R.id.id_favorite_cleaner -> {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_container, favoritesFragment)
-                        .commit()
-                supportActionBar!!.title = "Favorite Cleaner Page"
-            }
+//            R.id.id_favorite_cleaner -> {
+//                supportFragmentManager.beginTransaction()
+//                        .replace(R.id.main_container, favoritesFragment)
+//                        .commit()
+//                supportActionBar!!.title = "Favorite Cleaner Page"
+//            }
             R.id.id_location -> {
                 supportFragmentManager.beginTransaction()
                         .replace(R.id.main_container, locationFragment)

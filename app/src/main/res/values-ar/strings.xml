@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SparkCar</string>
+    <string name="favorite_cleaner_list_item_name">الاسم: %1$s</string>
+</resources>

@@ -4,6 +4,7 @@ buildscript {
     ext.kotlin_version = '1.2.0'
     ext.kotlinx_coroutines_version = '0.19.3'
     ext.anko_version = '0.10.2'
+    ext.support_library_version = '27.0.2'
 
     repositories {
         google()

@@ -53,10 +53,8 @@
                 <data android:scheme="@string/facebook_login_protocol_scheme" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".OrdersActivity" />
-        <activity android:name=".FavoritesDetails"></activity>
     </application>
 
 </manifest>

@@ -1,13 +1,12 @@
 package com.example.notebookpc.sparkcar
 
-import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import com.firebase.ui.auth.AuthUI
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.startActivity
 
 
-internal fun AppCompatActivity.selectNavigationItem(item: MenuItem) {
+internal fun TestingActivity.selectNavigationItem(item: MenuItem) {
     when (item.itemId) {
     //sends back to main activity
         R.id.id_home -> {
@@ -15,50 +14,50 @@ internal fun AppCompatActivity.selectNavigationItem(item: MenuItem) {
         }
         R.id.id_messagse -> {
             supportFragmentManager.beginTransaction()
-                    .replace(R.id.main_container, Fragments.messagesFragment)
+                    .replace(R.id.main_container, messagesFragment)
                     .commit()
             supportActionBar!!.title = "Messages Page"
 
         }
         R.id.id_settings -> {
             supportFragmentManager.beginTransaction()
-                    .replace(R.id.main_container, Fragments.settingsFragment)
+                    .replace(R.id.main_container, settingsFragment)
                     .commit()
             supportActionBar!!.title = "Settings Page"
         }
         R.id.id_profile -> {
             supportFragmentManager.beginTransaction()
-                    .replace(R.id.main_container, Fragments.profileFragment)
+                    .replace(R.id.main_container, profileFragment)
                     .commit()
             supportActionBar!!.title = "Profile Page"
         }
         R.id.id_favorite_cleaner -> {
             supportFragmentManager.beginTransaction()
-                    .replace(R.id.main_container, Fragments.favoritesFragment)
+                    .replace(R.id.main_container, favoriteCleanersFragment)
                     .commit()
             supportActionBar!!.title = "Favorite Cleaner Page"
         }
         R.id.id_location -> {
             supportFragmentManager.beginTransaction()
-                    .replace(R.id.main_container, Fragments.locationFragment)
+                    .replace(R.id.main_container, locationFragment)
                     .commit()
             supportActionBar!!.title = "Location Page"
         }
         R.id.id_car -> {
             supportFragmentManager.beginTransaction()
-                    .replace(R.id.main_container, Fragments.carsFragment)
+                    .replace(R.id.main_container, carsFragment)
                     .commit()
             supportActionBar!!.title = "Cars Page"
         }
         R.id.id_about -> {
             supportFragmentManager.beginTransaction()
-                    .replace(R.id.main_container, Fragments.aboutFragment)
+                    .replace(R.id.main_container, aboutFragment)
                     .commit()
             supportActionBar!!.title = "About Page"
         }
         R.id.id_share -> {
             supportFragmentManager.beginTransaction()
-                    .replace(R.id.main_container, Fragments.shareFragment)
+                    .replace(R.id.main_container, shareFragment)
                     .commit()
             supportActionBar!!.title = "Share Page"
         }
