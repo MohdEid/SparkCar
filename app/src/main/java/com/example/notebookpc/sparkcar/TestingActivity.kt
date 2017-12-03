@@ -2,6 +2,7 @@ package com.example.notebookpc.sparkcar
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -21,7 +22,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.widget.Toast
 import com.example.notebookpc.sparkcar.data.Cleaner
-import com.example.notebookpc.sparkcar.data.Customer
+import com.example.notebookpc.sparkcar.data.Users
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -63,6 +64,8 @@ class TestingActivity : AppCompatActivity(),
         val REQUEST_LOCATION_CODE = 99
         val REQUEST_CODE_LOCATION_SETTINGS: Int = 100
         var RC_SIGN_IN: Int = 123
+        private const val RC_SIGN_UP = 124
+
     }
 
     internal val messagesFragment = MessagesFragment.newInstance()
@@ -115,6 +118,7 @@ class TestingActivity : AppCompatActivity(),
     private val cleanersReference: DatabaseReference = FirebaseDatabase.getInstance().reference.child("cleaners")
     private val customersReference: DatabaseReference = FirebaseDatabase.getInstance().reference.child("customers")
     private val firebaseAuth = FirebaseAuth.getInstance()
+    private val usersDatabaseReference = FirebaseDatabase.getInstance().getReference("/customers")
 
 
     private val cleaners: MutableList<Cleaner> = mutableListOf()
@@ -433,52 +437,44 @@ class TestingActivity : AppCompatActivity(),
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+        val providers = FirebaseAuth.getInstance().currentUser?.providers
+        info { "Providers :" + providers }
         when (requestCode) {
-        //validates permissions to use map
-            REQUEST_CODE_LOCATION_SETTINGS -> {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    enableMyLocation()
+            RC_SIGN_IN -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    toast("Log in successful")
+
+                    val uid = firebaseAuth.currentUser?.uid ?: throw AssertionError()
+                    usersDatabaseReference.child(uid).addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onCancelled(p0: DatabaseError?) {
+                            toast("There is an error")
+                        }
+
+                        override fun onDataChange(snapshot: DataSnapshot?) {
+                            if (snapshot == null || snapshot.value == null) {
+                                startActivityForResult<SignUpActivity>(RC_SIGN_UP, "id" to uid)
+                            } else {
+                                val user = Users.fromSnapshot(snapshot) ?: throw AssertionError()
+                                toast("User was signed up already")
+                            }
+                        }
+                    })
+                } else {
+                    toast("Log in failed")
                 }
             }
 
-            RC_SIGN_IN -> {
-                //checks if result from sign is success
-                if (resultCode == RESULT_OK) {
-                    //get the id of the current user and check if the user is already in the database
-                    val uid = FirebaseAuth.getInstance().currentUser?.uid ?: throw AssertionError("User should be signed in in this part")
-                    customersReference.orderByChild("id").equalTo(uid).limitToFirst(1)
-                            .addListenerForSingleValueEvent(object : ValueEventListener {
-                                // customersReference.addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onCancelled(p0: DatabaseError?) {
-                                    toast("Error: ${p0.toString()}")
-                                    info("Customer not found in database")
-                                }
-
-                                override fun onDataChange(snapshot: DataSnapshot?) {
-                                    //checks if uid exists in database
-                                    info(snapshot)
-                                    //Reads all data from database and initialize them in customers class
-                                    for (item in snapshot?.children ?: return) {
-                                        val customer = Customer.newCustomer(item)
-                                        //checks if its a new sign in or exists from FirebaseAuth
-                                        //TODO verify if all entries not empty in database, if not then user must enter them in profile page
-                                        if (customer.id == uid) {
-                                            longToast("Customer signed in")
-                                            CustomerHolder.customer = customer
-                                        } else {
-                                            longToast("New user")
-                                            supportFragmentManager.beginTransaction()
-                                                    .replace(R.id.main_container, profileFragment)
-                                                    .commit()
-                                            supportActionBar!!.title = "Profile Page"
-                                        }
-                                    }
-                                }
-                            })
+            RC_SIGN_UP -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    longToast("Thank you for signing up")
                 } else {
-                    toast("Sign in failed. Please try again")
+                    longToast("Sign up failed")
+                    AuthUI.getInstance().signOut(this)
                 }
+            }
+
+            else -> {
+                super.onActivityResult(requestCode, resultCode, data)
             }
         }
     }

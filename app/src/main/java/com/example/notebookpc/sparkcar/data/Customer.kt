@@ -39,4 +39,16 @@ data class Customer(
             return Customer(id = id, name = name, mobile = mobile, email = email, favoriteLocations = favoriteLocations, favoriteCleaners = favoriteCleaners)
         }
     }
+
+    fun toMap(): Map<String, Any> {
+        val map = mutableMapOf<String, Any>()
+
+        map["name"] = name
+        map["mobile"] = mobile
+        map["email"] = email
+        map["favorite_locations"] = favoriteLocations
+        map["favorite_cleaners"] = favoriteCleaners
+
+        return map
+    }
 }
