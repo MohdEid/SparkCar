@@ -8,15 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
-
-/**
- * A simple [Fragment] subclass.
- * Activities that contain this fragment must implement the
- * [AboutFragment.OnFragmentInteractionListener] interface
- * to handle interaction events.
- * Use the [AboutFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class AboutFragment : Fragment() {
 
 
@@ -29,11 +20,7 @@ class AboutFragment : Fragment() {
     }
 
 
-    fun onButtonPressed(uri: Uri) {
-        if (mListener != null) {
-            mListener!!.onFragmentInteraction(uri)
-        }
-    }
+
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
@@ -58,8 +45,7 @@ class AboutFragment : Fragment() {
     companion object {
 
         fun newInstance(): AboutFragment {
-            val fragment = AboutFragment()
-            return fragment
+            return AboutFragment()
         }
     }
 }// Required empty public constructor

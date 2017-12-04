@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity
 import com.example.notebookpc.sparkcar.data.Customer
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import kotlinx.android.synthetic.main.activity_signup.*
+import kotlinx.android.synthetic.main.activity_sign_up.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.toast
 
@@ -56,7 +56,8 @@ class SignUpActivity : AppCompatActivity() {
             }
 
             val uid = intent.extras.getString("id")
-            val customer = Customer(id = uid, name = name, email = email, mobile = mobile, favoriteCleaners = listOf(), favoriteLocations = listOf())
+            val customer =
+                    Customer(id = uid, name = name, email = email, mobile = mobile, favoriteCleaners = listOf(), favoriteLocations = listOf())
             val task = FirebaseDatabase.getInstance().getReference("/customers/" + uid).setValue(customer.toMap())
             task.addOnCompleteListener {
                 if (it.isSuccessful) {

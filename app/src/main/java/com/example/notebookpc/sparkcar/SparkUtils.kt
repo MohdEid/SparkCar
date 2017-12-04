@@ -12,18 +12,12 @@ internal fun TestingActivity.selectNavigationItem(item: MenuItem) {
         R.id.id_home -> {
             startActivity<TestingActivity>()
         }
-        R.id.id_messagse -> {
+        R.id.id_messages -> {
             supportFragmentManager.beginTransaction()
                     .replace(R.id.main_container, messagesFragment)
                     .commit()
             supportActionBar!!.title = "Messages Page"
 
-        }
-        R.id.id_settings -> {
-            supportFragmentManager.beginTransaction()
-                    .replace(R.id.main_container, settingsFragment)
-                    .commit()
-            supportActionBar!!.title = "Settings Page"
         }
         R.id.id_profile -> {
             supportFragmentManager.beginTransaction()

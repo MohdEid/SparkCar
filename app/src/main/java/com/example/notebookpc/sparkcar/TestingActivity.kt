@@ -22,7 +22,6 @@ import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.widget.Toast
 import com.example.notebookpc.sparkcar.data.Cleaner
-import com.example.notebookpc.sparkcar.data.Users
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -52,7 +51,6 @@ class TestingActivity : AppCompatActivity(),
         GoogleApiClient.OnConnectionFailedListener,
         NavigationView.OnNavigationItemSelectedListener,
         MessagesFragment.OnFragmentInteractionListener,
-        SettingsFragment.OnFragmentInteractionListener,
         ProfileFragment.OnFragmentInteractionListener,
         FavoriteCleanersFragment.OnFragmentInteractionListener,
         LocationFragment.OnFragmentInteractionListener,
@@ -69,7 +67,6 @@ class TestingActivity : AppCompatActivity(),
     }
 
     internal val messagesFragment = MessagesFragment.newInstance()
-    internal val settingsFragment = SettingsFragment.newInstance()
     internal val shareFragment = ShareFragment.newInstance()
     internal val profileFragment = ProfileFragment.newInstance()
     internal val carsFragment = CarsFragment.newInstance()
@@ -116,9 +113,8 @@ class TestingActivity : AppCompatActivity(),
 
     //Firebase Initialization
     private val cleanersReference: DatabaseReference = FirebaseDatabase.getInstance().reference.child("cleaners")
-    private val customersReference: DatabaseReference = FirebaseDatabase.getInstance().reference.child("customers")
     private val firebaseAuth = FirebaseAuth.getInstance()
-    private val usersDatabaseReference = FirebaseDatabase.getInstance().getReference("/customers")
+    private val customersReference = FirebaseDatabase.getInstance().getReference("/customers")
 
 
     private val cleaners: MutableList<Cleaner> = mutableListOf()
@@ -137,6 +133,7 @@ class TestingActivity : AppCompatActivity(),
         actionBarDrawerToggle = ActionBarDrawerToggle(this, drawerLayout, null, R.string.drawer_opened, R.string.drawer_closed)
         drawerLayout.addDrawerListener(actionBarDrawerToggle)
 
+        //TODO need to fill Customer name and Mobile number in the Navigation Header
         navigationView = findViewById(R.id.navigation_view)
         navigationView.setNavigationItemSelectedListener(this)
 
@@ -173,14 +170,33 @@ class TestingActivity : AppCompatActivity(),
         }
     }
 
+    //TODO hide also other items not needed to be seen while user isn't signed up
     //updates the visibility of sign out in the menu when the user is signed in or not
     private fun updateSignOutItem() {
-        val item = navigationView.menu.findItem(R.id.id_sign_out)
+        val signOutItem = navigationView.menu.findItem(R.id.id_sign_out)
+        val messagesItem = navigationView.menu.findItem(R.id.id_messages)
+        val profileItem = navigationView.menu.findItem(R.id.id_profile)
+        val locationItem = navigationView.menu.findItem(R.id.id_location)
+        val favoriteCleanerItem = navigationView.menu.findItem(R.id.id_favorite_cleaner)
+        val favoriteCarsItem = navigationView.menu.findItem(R.id.id_car)
+
+
+
         if (firebaseAuth.currentUser != null) {
-            item.isVisible = true
+            signOutItem.isVisible = true
+            messagesItem.isVisible = true
+            profileItem.isVisible = true
+            favoriteCleanerItem.isVisible = true
+            locationItem.isVisible = true
+            favoriteCarsItem.isVisible = true
             this.invalidateOptionsMenu()
         } else {
-            item.isVisible = false
+            signOutItem.isVisible = false
+            messagesItem.isVisible = false
+            profileItem.isVisible = false
+            favoriteCleanerItem.isVisible = false
+            locationItem.isVisible = false
+            favoriteCarsItem.isVisible = false
             this.invalidateOptionsMenu()
         }
     }
@@ -312,7 +328,7 @@ class TestingActivity : AppCompatActivity(),
                 title = cleanerTag.title
                 customView {
                     include<ConstraintLayout>(R.layout.custom_dialog)
-//                    txtMobileNumber.text= cleaners[2].toString()
+                    //TODO fill the data in the custom dialog
                 }
                 positiveButton("Request Cleaner") {
 
@@ -445,7 +461,7 @@ class TestingActivity : AppCompatActivity(),
                     toast("Log in successful")
 
                     val uid = firebaseAuth.currentUser?.uid ?: throw AssertionError()
-                    usersDatabaseReference.child(uid).addListenerForSingleValueEvent(object : ValueEventListener {
+                    customersReference.child(uid).addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onCancelled(p0: DatabaseError?) {
                             toast("There is an error")
                         }
@@ -453,10 +469,11 @@ class TestingActivity : AppCompatActivity(),
                         override fun onDataChange(snapshot: DataSnapshot?) {
                             if (snapshot == null || snapshot.value == null) {
                                 startActivityForResult<SignUpActivity>(RC_SIGN_UP, "id" to uid)
-                            } else {
-                                val user = Users.fromSnapshot(snapshot) ?: throw AssertionError()
-                                toast("User was signed up already")
                             }
+// else {
+//                                val user = Users.fromSnapshot(snapshot) ?: throw AssertionError()
+//                                toast("User was signed up already")
+//                            }
                         }
                     })
                 } else {

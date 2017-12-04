@@ -10,7 +10,7 @@ import android.view.ViewGroup
 
 class PaymentFragment : Fragment() {
 
-    //
+    //TODO have to add payments methods
 
     private var mListener: OnFragmentInteractionListener? = null
 

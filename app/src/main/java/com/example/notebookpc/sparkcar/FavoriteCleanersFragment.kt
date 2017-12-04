@@ -21,6 +21,7 @@ class FavoriteCleanersFragment : Fragment() {
 
     private lateinit var favoritesList: List<Id>
 
+    //TODO fix problem with fragment doesn't load with empty favorites
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -33,9 +34,9 @@ class FavoriteCleanersFragment : Fragment() {
         favoritesList = CustomerHolder.customer.favoriteCleaners
 
         val adapter = FavoritesAdapter(favoritesList)
-        recyclerView.layoutManager = LinearLayoutManager(activity)
-        recyclerView.adapter = adapter
-        recyclerView.addItemDecoration(DividerItemDecoration(activity, LinearLayoutManager.VERTICAL))
+        favoriteCleanersRecyclerView.layoutManager = LinearLayoutManager(activity)
+        favoriteCleanersRecyclerView.adapter = adapter
+        favoriteCleanersRecyclerView.addItemDecoration(DividerItemDecoration(activity, LinearLayoutManager.VERTICAL))
     }
 
     override fun onAttach(context: Context?) {

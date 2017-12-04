@@ -46,4 +46,13 @@
     <string name="favorite_cleaner_list_item_name">Name: %s</string>
     <string name="favorite_cleaner_list_item_rating">Rating: %f</string>
     <string name="favorite_cleaner_list_item_availability">Available: %b</string>
+    <string name="your_name">Your Name</string>
+    <string name="email">Email</string>
+    <string name="current_password">Current Password</string>
+    <string name="new_password">New Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="save">Save</string>
+    <string name="add_cleaner">+Add Cleaner</string>
+    <string name="restore">Restore</string>
+    <string name="delete">Delete</string>
 </resources>

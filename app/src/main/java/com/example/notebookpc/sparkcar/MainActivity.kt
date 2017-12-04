@@ -2,6 +2,7 @@ package com.example.notebookpc.sparkcar
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -13,13 +14,15 @@ import android.support.annotation.RequiresPermission
 import android.support.constraint.ConstraintLayout
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import android.widget.Toast
+import com.example.notebookpc.sparkcar.data.Cleaner
+import com.example.notebookpc.sparkcar.data.Users
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -47,7 +50,6 @@ class MainActivity : AppCompatActivity(),
         GoogleApiClient.OnConnectionFailedListener,
         NavigationView.OnNavigationItemSelectedListener,
         MessagesFragment.OnFragmentInteractionListener,
-        SettingsFragment.OnFragmentInteractionListener,
         ProfileFragment.OnFragmentInteractionListener,
         FavoriteCleanersFragment.OnFragmentInteractionListener,
         LocationFragment.OnFragmentInteractionListener,
@@ -59,13 +61,23 @@ class MainActivity : AppCompatActivity(),
         val REQUEST_LOCATION_CODE = 99
         val REQUEST_CODE_LOCATION_SETTINGS: Int = 100
         var RC_SIGN_IN: Int = 123
+        private const val RC_SIGN_UP = 124
+
     }
+
+    internal val messagesFragment = MessagesFragment.newInstance()
+    internal val shareFragment = ShareFragment.newInstance()
+    internal val profileFragment = ProfileFragment.newInstance()
+    internal val carsFragment = CarsFragment.newInstance()
+    internal val aboutFragment = AboutFragment.newInstance()
+    internal val favoriteCleanersFragment: Fragment = FavoriteCleanersFragment.newInstance()
+    internal val locationFragment = LocationFragment.newInstance()
 
     //GoogleMaps Initialization
     private lateinit var map: GoogleMap
     private lateinit var client: GoogleApiClient
     private lateinit var locationRequest: LocationRequest
-    private lateinit var lastLocation: Location
+    private var lastLocation: Location? = null
     private var currentLocationMarker: Marker? = null
     private val cleanersMarkers = mutableMapOf<Id, Marker>()
 
@@ -73,11 +85,10 @@ class MainActivity : AppCompatActivity(),
     private val locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(location: LocationResult?) {
             super.onLocationResult(location)
-            lastLocation = location?.lastLocation ?: return
 
             currentLocationMarker?.remove()
 
-
+            val lastLocation = lastLocation ?: return
             val latLng = LatLng(lastLocation.latitude, lastLocation.longitude)
 
             val markerOptions = MarkerOptions()
@@ -95,25 +106,16 @@ class MainActivity : AppCompatActivity(),
 
     //Navigation Drawer Initialization
     private lateinit var drawerLayout: DrawerLayout
-    private lateinit var toolBar: Toolbar
     private lateinit var actionBarDrawerToggle: ActionBarDrawerToggle
     private lateinit var navigationView: NavigationView
 
 
-    //fragments Initializing
-    private val messagesFragment = MessagesFragment.newInstance()
-    private val settingsFragment = SettingsFragment.newInstance()
-    private val shareFragment = ShareFragment.newInstance()
-    private val profileFragment = ProfileFragment.newInstance()
-    private val carsFragment = CarsFragment.newInstance()
-    private val aboutFragment = AboutFragment.newInstance()
-    //    private val favoritesFragment = FavoriteCleanersFragment.newInstance()
-    private val locationFragment = LocationFragment.newInstance()
-
-    //    private val item: MenuItem = (R.id.id_sign_out) as MenuItem
-
     //Firebase Initialization
-    private val ref: DatabaseReference = FirebaseDatabase.getInstance().reference.child("cleaners")
+    private val cleanersReference: DatabaseReference = FirebaseDatabase.getInstance().reference.child("cleaners")
+    private val customersReference: DatabaseReference = FirebaseDatabase.getInstance().reference.child("customers")
+    private val firebaseAuth = FirebaseAuth.getInstance()
+    private val usersDatabaseReference = FirebaseDatabase.getInstance().getReference("/customers")
+
 
     private val cleaners: MutableList<Cleaner> = mutableListOf()
 
@@ -121,34 +123,31 @@ class MainActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_testing)
 
-        //TODO fix visibility of sign out in the menu
-//        if (client.isConnected) {
-//
-//            item.isVisible = false
-//            this.invalidateOptionsMenu()
-//        } else {
-//            item.isVisible = true
-//            this.invalidateOptionsMenu()
-//        }
-
+        //TODO remove this when done fixing signing in
+        if (firebaseAuth.currentUser != null) {
+            AuthUI.getInstance().signOut(this)
+        }
         //instantiating NavigationDrawer
         drawerLayout = findViewById(R.id.drawer_layout)
-        toolBar = findViewById(R.id.toolbar)
 
-        actionBarDrawerToggle = ActionBarDrawerToggle(this, drawerLayout, toolBar, R.string.drawer_opened, R.string.drawer_closed)
+        actionBarDrawerToggle = ActionBarDrawerToggle(this, drawerLayout, null, R.string.drawer_opened, R.string.drawer_closed)
         drawerLayout.addDrawerListener(actionBarDrawerToggle)
 
         navigationView = findViewById(R.id.navigation_view)
         navigationView.setNavigationItemSelectedListener(this)
 
+        updateSignOutItem()
+
         fused = LocationServices.getFusedLocationProviderClient(this)
 
+        //adds map fragment to main activity
         val mapFragment = SupportMapFragment()
         supportFragmentManager.beginTransaction()
                 .replace(R.id.main_container, mapFragment)
                 .commit()
         mapFragment.getMapAsync(this)
 
+        //checks if build version of sdk is recent
         if (servicesOk()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 checkLocationPermission()
@@ -158,12 +157,28 @@ class MainActivity : AppCompatActivity(),
             Toast.makeText(this, "Map is not Connected", Toast.LENGTH_LONG).show()
         }
 
+        //requests the location of user
         locationRequest = LocationRequest()
 
         locationRequest.interval = 5000
         locationRequest.fastestInterval = 5000
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 
+        firebaseAuth.addAuthStateListener {
+            updateSignOutItem()
+        }
+    }
+
+    //updates the visibility of sign out in the menu when the user is signed in or not
+    private fun updateSignOutItem() {
+        val item = navigationView.menu.findItem(R.id.id_sign_out)
+        if (firebaseAuth.currentUser != null) {
+            item.isVisible = true
+            this.invalidateOptionsMenu()
+        } else {
+            item.isVisible = false
+            this.invalidateOptionsMenu()
+        }
     }
 
     /**
@@ -176,18 +191,21 @@ class MainActivity : AppCompatActivity(),
 
     }
 
+    //adds cleaner marker to the map
     private fun addCleaner(cleaner: Cleaner) {
         cleaners.add(cleaner)
         val marker = map.addMarker(MarkerOptions()
                 .position(cleaner.location)
                 .title(cleaner.name)
-                .snippet("Mobile: ${cleaner.mobile} \nRating: ${cleaner.rating}")
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)))
-        marker.tag = CleanerTag(cleaner.name, "Mobile: ${cleaner.mobile}", rating = cleaner.rating)
+        marker.snippet = createSnippet(marker)
+        marker.tag = CleanerTag(cleaner.name, createSnippet(marker), rating = cleaner.rating)
         cleanersMarkers.put(cleaner.id, marker)
 
     }
 
+    /**
+     * This function tracks the location of cleaner when they move*/
     private fun moveCleaner(cleaner: Cleaner) {
         cleaners.removeAll { it.id == cleaner.id }
         cleaners.add(cleaner)
@@ -196,8 +214,7 @@ class MainActivity : AppCompatActivity(),
             position = cleaner.location
             title = cleaner.name
 
-            //TODO replace Mobile number with distance, and Rating to numerical
-            snippet = "Mobile: ${cleaner.mobile} \nRating: ${cleaner.rating}"
+            snippet = createSnippet(this)
 
             tag = CleanerTag(cleaner.name, "Mobile: ${cleaner.mobile}", rating = cleaner.rating)
             if (isInfoWindowShown) {
@@ -207,101 +224,29 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
+    private fun createSnippet(marker: Marker): String {
+        val lastLocation = lastLocation ?: return ""
+        val cleanerTag = marker.tag as? CleanerTag ?: return ""
+        val distance: Int = calculateDistance(marker.position, LatLng(lastLocation.latitude, lastLocation.longitude)).toInt()
+        return "${distance / 1000}km    ${cleanerTag.rating.toInt()}/5"
+    }
 
-    //calling variables of the cleaners database
-    private data class Cleaner(
-            val id: Id = "",
-            val location: LatLng,
-            val mobile: String = "",
-            val name: String = "",
-            val rating: Float = 0.0f
-    ) {
-        companion object {
-            fun newCleaner(dataSnapshot: DataSnapshot?): Cleaner {
-                val snapshot = dataSnapshot ?: throw AssertionError("Null child added to database")
-                val id = snapshot.child("id").getValue(Id::class.java) ?: throw AssertionError("child not expected to be null")
-                val lat = snapshot.child("location/lat").getValue(Double::class.java) ?: throw AssertionError("child not expected to be null")
-                val lon = snapshot.child("location/lon").getValue(Double::class.java) ?: throw AssertionError("child not expected to be null")
-                val location = LatLng(lat, lon)
-                val name = snapshot.child("name").getValue(String::class.java) ?: throw AssertionError("child not expected to be null")
-                val mobile = snapshot.child("mobile").getValue(String::class.java) ?: throw AssertionError("child not expected to be null")
-                val rating = snapshot.child("rating").getValue(Float::class.java) ?: throw AssertionError("child not expected to be null")
-
-                return Cleaner(id = id, name = name, location = location, mobile = mobile, rating = rating)
-            }
-        }
+    private fun calculateDistance(start: LatLng, end: LatLng): Float {
+        val result = floatArrayOf(0.0f)
+        Location.distanceBetween(start.latitude, start.longitude, end.latitude, end.longitude, result)
+        return result[0]
     }
 
     data class CleanerTag(val title: String,
                           val message: String,
                           val rating: Float)
 
-    //TODO check if its possible to move this to different class, to be called again
+
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
         drawerLayout.closeDrawers()
 
-        when (item.itemId) {
-        //sends back to main activity
-            R.id.id_home -> {
-                startActivity<TestingActivity>()
-            }
-            R.id.id_messagse -> {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_container, messagesFragment)
-                        .commit()
-                supportActionBar!!.title = "Messages Page"
-
-            }
-            R.id.id_settings -> {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_container, settingsFragment)
-                        .commit()
-                supportActionBar!!.title = "Settings Page"
-            }
-            R.id.id_profile -> {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_container, profileFragment)
-                        .commit()
-                supportActionBar!!.title = "Profile Page"
-            }
-//            R.id.id_favorite_cleaner -> {
-//                supportFragmentManager.beginTransaction()
-//                        .replace(R.id.main_container, favoritesFragment)
-//                        .commit()
-//                supportActionBar!!.title = "Favorite Cleaner Page"
-//            }
-            R.id.id_location -> {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_container, locationFragment)
-                        .commit()
-                supportActionBar!!.title = "Location Page"
-            }
-            R.id.id_car -> {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_container, carsFragment)
-                        .commit()
-                supportActionBar!!.title = "Cars Page"
-            }
-            R.id.id_about -> {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_container, aboutFragment)
-                        .commit()
-                supportActionBar!!.title = "About Page"
-            }
-            R.id.id_share -> {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_container, shareFragment)
-                        .commit()
-                supportActionBar!!.title = "Share Page"
-            }
-        //TODO need to make this visible only if the user is signed in
-        //sign out
-            R.id.id_sign_out -> {
-                AuthUI.getInstance().signOut(this)
-                longToast("Logging out successfully")
-            }
-        }
+        //selectNavigationItem(item)
         return true
     }
 
@@ -330,12 +275,6 @@ class MainActivity : AppCompatActivity(),
 
         //add markers on the map
 
-        //TODO add custom marker and save it to database
-        /*val options = MarkerOptions()
-                .title("Custom Location")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
-                .position( LatLng())
-                        map.addMarker()*/
 
         //adds cleaners markers from database to the map
         val cleanersListener = object : ChildEventListener {
@@ -358,25 +297,24 @@ class MainActivity : AppCompatActivity(),
             override fun onChildRemoved(dataSnapshot: DataSnapshot?) {
                 val cleaner = Cleaner.newCleaner(dataSnapshot)
                 removeCleaner(cleaner)
-
             }
         }
-        ref.addChildEventListener(cleanersListener)
+        cleanersReference.addChildEventListener(cleanersListener)
 
-        map.setOnInfoWindowClickListener {
+        //sets listener on the window of marker of a cleaner
+        map.setOnInfoWindowClickListener { marker: Marker? ->
             alert {
-                //                val dataSnapShot:DataSnapshot?
-//                val cleaner =Cleaner.newCleaner(dataSnapShot)
-                //TODO add cleaner name to the title
-                title = "This is a cleaner"
+                val cleanerTag = marker?.tag as? CleanerTag ?: return@alert
+                title = cleanerTag.title
                 customView {
                     include<ConstraintLayout>(R.layout.custom_dialog)
 //                    txtMobileNumber.text= cleaners[2].toString()
                 }
                 positiveButton("Request Cleaner") {
 
-                    val firebaseAuth = FirebaseAuth.getInstance()
+                    //verifies if there is a user signed in or not
                     if (firebaseAuth.currentUser == null) {
+                        //starts an intent to sign in or sign up
                         val signInIntent = AuthUI.getInstance().createSignInIntentBuilder().setAvailableProviders(
                                 listOf(AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
                                         AuthUI.IdpConfig.Builder(AuthUI.PHONE_VERIFICATION_PROVIDER).build(),
@@ -386,15 +324,21 @@ class MainActivity : AppCompatActivity(),
                                 .build()
                         startActivityForResult(signInIntent, RC_SIGN_IN)
                     } else {
+                        //loads the activity when the user is present
                         startActivity<OrdersActivity>()
                     }
                 }
                 negativeButton("Cancel") {}
             }.show()
         }
+        map.setOnMarkerClickListener { marker ->
+            marker.snippet = createSnippet(marker)
+            false
+        }
     }
 
 
+    //validates if Location Services is enabled in the device or not
     private fun checkLocationSetting() {
         val locationSettingsBuilder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
         val task = LocationServices
@@ -411,18 +355,20 @@ class MainActivity : AppCompatActivity(),
 
     }
 
+    //shows your current location
     @RequiresPermission(value = Manifest.permission.ACCESS_FINE_LOCATION)
     @SuppressLint("MissingPermission")
     private fun enableMyLocation() {
         map.isMyLocationEnabled = true
         fused.lastLocation.addOnSuccessListener {
-            val location = it ?: return@addOnSuccessListener
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude), 13f))
+            lastLocation = it ?: return@addOnSuccessListener
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lastLocation!!.latitude, lastLocation!!.longitude), 13f))
         }
 
         fused.requestLocationUpdates(locationRequest, locationCallback, null)
     }
 
+    //checks if the device has recent google play services or not
     private fun servicesOk(): Boolean {
 
         val isAvailable: Int = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this)
@@ -438,6 +384,7 @@ class MainActivity : AppCompatActivity(),
         return false
     }
 
+    //instantiate google map
     @Synchronized private fun buildGoogleApiClient() {
         client = GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -457,16 +404,16 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        //checks if permissions granted to access GPS or not
         when (requestCode) {
             TestingActivity.REQUEST_LOCATION_CODE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                         buildGoogleApiClient()
-
                         enableMyLocation()
                     }
                 } else {
-                    longToast("something went wrong")
+                    longToast("Something went wrong")
                 }
                 return
             }
@@ -486,12 +433,44 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+        val providers = FirebaseAuth.getInstance().currentUser?.providers
+        info { "Providers :" + providers }
         when (requestCode) {
-            TestingActivity.REQUEST_CODE_LOCATION_SETTINGS -> {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    enableMyLocation()
+            RC_SIGN_IN -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    toast("Log in successful")
+
+                    val uid = firebaseAuth.currentUser?.uid ?: throw AssertionError()
+                    usersDatabaseReference.child(uid).addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onCancelled(p0: DatabaseError?) {
+                            toast("There is an error")
+                        }
+
+                        override fun onDataChange(snapshot: DataSnapshot?) {
+                            if (snapshot == null || snapshot.value == null) {
+                                startActivityForResult<SignUpActivity>(RC_SIGN_UP, "id" to uid)
+                            } else {
+                                val user = Users.fromSnapshot(snapshot) ?: throw AssertionError()
+                                toast("User was signed up already")
+                            }
+                        }
+                    })
+                } else {
+                    toast("Log in failed")
                 }
+            }
+
+            RC_SIGN_UP -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    longToast("Thank you for signing up")
+                } else {
+                    longToast("Sign up failed")
+                    AuthUI.getInstance().signOut(this)
+                }
+            }
+
+            else -> {
+                super.onActivityResult(requestCode, resultCode, data)
             }
         }
     }
