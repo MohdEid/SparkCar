@@ -42,6 +42,8 @@
     <string name="name">Name:</string>
     <string name="car_plate">Car Plate</string>
     <string name="car_color">Car Color:</string>
+    <string name="set_pickup_location">Set your new cleaning location</string>
+    <string name="delivery_point">Cleaning Point</string>
 
     <string name="favorite_cleaner_list_item_name">Name: %s</string>
     <string name="favorite_cleaner_list_item_rating">Rating: %f</string>
@@ -55,4 +57,8 @@
     <string name="add_cleaner">+Add Cleaner</string>
     <string name="restore">Restore</string>
     <string name="delete">Delete</string>
+    <string name="display_mobile_number">Mobile: %s</string>
+    <string name="title_activity_pick_location">Map</string>
+    <string name="add_location">Add</string>
+    <string name="please_long_click_location">Hold to set Location</string>
 </resources>

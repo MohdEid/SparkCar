@@ -56,12 +56,13 @@ class SignUpActivity : AppCompatActivity() {
             }
 
             val uid = intent.extras.getString("id")
-            val customer =
-                    Customer(id = uid, name = name, email = email, mobile = mobile, favoriteCleaners = listOf(), favoriteLocations = listOf())
+            val customer = Customer(id = uid, name = name, email = email, mobile = mobile,
+                    favoriteCleaners = listOf(), favoriteLocations = listOf())
             val task = FirebaseDatabase.getInstance().getReference("/customers/" + uid).setValue(customer.toMap())
             task.addOnCompleteListener {
                 if (it.isSuccessful) {
                     setResult(RESULT_OK)
+                    CustomerHolder.customer = customer
                     finish()
                 } else {
                     toast("Exception occurred: " + it.exception?.message)

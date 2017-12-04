@@ -11,7 +11,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresPermission
-import android.support.constraint.ConstraintLayout
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
@@ -20,15 +19,16 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
+import android.view.View
+import android.widget.RatingBar
+import android.widget.TextView
 import android.widget.Toast
 import com.example.notebookpc.sparkcar.data.Cleaner
+import com.example.notebookpc.sparkcar.data.Customer
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.CommonStatusCodes
 import com.google.android.gms.common.api.GoogleApiClient
-import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -60,7 +60,7 @@ class TestingActivity : AppCompatActivity(),
 
     companion object {
         val REQUEST_LOCATION_CODE = 99
-        val REQUEST_CODE_LOCATION_SETTINGS: Int = 100
+        val RC_LOCATION_SETTINGS: Int = 100
         var RC_SIGN_IN: Int = 123
         private const val RC_SIGN_UP = 124
 
@@ -123,10 +123,26 @@ class TestingActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_testing)
 
-        //TODO remove this when done fixing signing in
+        //TODO fix race condition
         if (firebaseAuth.currentUser != null) {
-            AuthUI.getInstance().signOut(this)
+
+            val uid = firebaseAuth.currentUser?.uid ?: throw AssertionError()
+            customersReference.child(uid).addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onCancelled(p0: DatabaseError?) {
+                    toast("There is an error")
+                }
+
+                override fun onDataChange(snapshot: DataSnapshot?) {
+                    if (snapshot == null || snapshot.value == null) {
+                        signOut()
+                    } else {
+                        CustomerHolder.customer = Customer.newCustomer(snapshot)
+                    }
+                }
+            })
         }
+
+
         //instantiating NavigationDrawer
         drawerLayout = findViewById(R.id.drawer_layout)
 
@@ -179,6 +195,7 @@ class TestingActivity : AppCompatActivity(),
         val locationItem = navigationView.menu.findItem(R.id.id_location)
         val favoriteCleanerItem = navigationView.menu.findItem(R.id.id_favorite_cleaner)
         val favoriteCarsItem = navigationView.menu.findItem(R.id.id_car)
+        val signInItem = navigationView.menu.findItem(R.id.id_sign_in)
 
 
 
@@ -189,6 +206,7 @@ class TestingActivity : AppCompatActivity(),
             favoriteCleanerItem.isVisible = true
             locationItem.isVisible = true
             favoriteCarsItem.isVisible = true
+            signInItem.isVisible = false
             this.invalidateOptionsMenu()
         } else {
             signOutItem.isVisible = false
@@ -197,6 +215,7 @@ class TestingActivity : AppCompatActivity(),
             favoriteCleanerItem.isVisible = false
             locationItem.isVisible = false
             favoriteCarsItem.isVisible = false
+            signInItem.isVisible = true
             this.invalidateOptionsMenu()
         }
     }
@@ -219,7 +238,8 @@ class TestingActivity : AppCompatActivity(),
                 .title(cleaner.name)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)))
         marker.snippet = createSnippet(marker)
-        marker.tag = CleanerTag(cleaner.name, createSnippet(marker), rating = cleaner.rating)
+        marker.tag = CleanerTag(title = cleaner.name, message = createSnippet(marker), rating = cleaner.rating,
+                mobile = cleaner.mobile, isAvailable = cleaner.isAvailable, id = cleaner.id)
         cleanersMarkers.put(cleaner.id, marker)
 
     }
@@ -236,7 +256,8 @@ class TestingActivity : AppCompatActivity(),
 
             snippet = createSnippet(this)
 
-            tag = CleanerTag(cleaner.name, "Mobile: ${cleaner.mobile}", rating = cleaner.rating)
+            tag = CleanerTag(cleaner.name, message = "Mobile: ${cleaner.mobile}",
+                    rating = cleaner.rating, isAvailable = cleaner.isAvailable, mobile = cleaner.mobile, id = cleaner.id)
             if (isInfoWindowShown) {
                 hideInfoWindow()
                 showInfoWindow()
@@ -258,8 +279,11 @@ class TestingActivity : AppCompatActivity(),
     }
 
     data class CleanerTag(val title: String,
+                          val id: Id,
                           val message: String,
-                          val rating: Float)
+                          val mobile: String,
+                          val rating: Float,
+                          val isAvailable: Boolean)
 
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -287,11 +311,13 @@ class TestingActivity : AppCompatActivity(),
 
         map.uiSettings.isZoomControlsEnabled = true
 
-        checkLocationSetting()
+        checkLocationSetting(RC_LOCATION_SETTINGS)
+
         buildGoogleApiClient()
         if (checkLocationPermission()) {
             enableMyLocation()
         }
+
 
         //add markers on the map
 
@@ -327,8 +353,16 @@ class TestingActivity : AppCompatActivity(),
                 val cleanerTag = marker?.tag as? CleanerTag ?: return@alert
                 title = cleanerTag.title
                 customView {
-                    include<ConstraintLayout>(R.layout.custom_dialog)
-                    //TODO fill the data in the custom dialog
+                    val view = include<View>(R.layout.custom_dialog)
+
+                    val mobileTextView = view.find<TextView>(R.id.txtMobile)
+                    mobileTextView.text = getString(R.string.display_mobile_number, cleanerTag.mobile)
+
+                    val isAvailableTextView = view.find<TextView>(R.id.txtActive)
+                    isAvailableTextView.text = if (cleanerTag.isAvailable) "Available" else "Not available"
+
+                    val ratingBar = view.find<RatingBar>(R.id.ratingBar)
+                    ratingBar.rating = cleanerTag.rating
                 }
                 positiveButton("Request Cleaner") {
 
@@ -345,10 +379,11 @@ class TestingActivity : AppCompatActivity(),
                         startActivityForResult(signInIntent, RC_SIGN_IN)
                     } else {
                         //loads the activity when the user is present
-                        startActivity<OrdersActivity>()
+                        startActivity<OrdersActivity>("cleaner" to cleanerTag)
                     }
                 }
                 negativeButton("Cancel") {}
+                neutralPressed("favorite") {}
             }.show()
         }
         map.setOnMarkerClickListener { marker ->
@@ -359,21 +394,7 @@ class TestingActivity : AppCompatActivity(),
 
 
     //validates if Location Services is enabled in the device or not
-    private fun checkLocationSetting() {
-        val locationSettingsBuilder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
-        val task = LocationServices
-                .getSettingsClient(this@TestingActivity)
-                .checkLocationSettings(locationSettingsBuilder.build())
-        task.addOnFailureListener {
-            when ((task.exception as ApiException).statusCode) {
-                CommonStatusCodes.RESOLUTION_REQUIRED -> {
-                    (task.exception as ResolvableApiException)
-                            .startResolutionForResult(this@TestingActivity, TestingActivity.REQUEST_CODE_LOCATION_SETTINGS)
-                }
-            }
-        }
 
-    }
 
     //shows your current location
     @RequiresPermission(value = Manifest.permission.ACCESS_FINE_LOCATION)
@@ -453,10 +474,17 @@ class TestingActivity : AppCompatActivity(),
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
         val providers = FirebaseAuth.getInstance().currentUser?.providers
         info { "Providers :" + providers }
         when (requestCode) {
+            RC_LOCATION_SETTINGS -> {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    enableMyLocation()
+                }
+            }
             RC_SIGN_IN -> {
+
                 if (resultCode == Activity.RESULT_OK) {
                     toast("Log in successful")
 
@@ -469,11 +497,9 @@ class TestingActivity : AppCompatActivity(),
                         override fun onDataChange(snapshot: DataSnapshot?) {
                             if (snapshot == null || snapshot.value == null) {
                                 startActivityForResult<SignUpActivity>(RC_SIGN_UP, "id" to uid)
+                            } else {
+                                CustomerHolder.customer = Customer.newCustomer(snapshot)
                             }
-// else {
-//                                val user = Users.fromSnapshot(snapshot) ?: throw AssertionError()
-//                                toast("User was signed up already")
-//                            }
                         }
                     })
                 } else {
@@ -486,7 +512,7 @@ class TestingActivity : AppCompatActivity(),
                     longToast("Thank you for signing up")
                 } else {
                     longToast("Sign up failed")
-                    AuthUI.getInstance().signOut(this)
+                    signOut()
                 }
             }
 
@@ -494,5 +520,10 @@ class TestingActivity : AppCompatActivity(),
                 super.onActivityResult(requestCode, resultCode, data)
             }
         }
+    }
+
+    private fun signOut() {
+        AuthUI.getInstance().signOut(this)
+        CustomerHolder.customer = null
     }
 }

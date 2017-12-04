@@ -31,7 +31,8 @@ class FavoriteCleanersFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        favoritesList = CustomerHolder.customer.favoriteCleaners
+        val customer = CustomerHolder.customer ?: throw AssertionError()
+        favoritesList = customer.favoriteCleaners
 
         val adapter = FavoritesAdapter(favoritesList)
         favoriteCleanersRecyclerView.layoutManager = LinearLayoutManager(activity)

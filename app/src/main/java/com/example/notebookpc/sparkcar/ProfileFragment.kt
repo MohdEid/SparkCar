@@ -10,9 +10,11 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.fragment_profile.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.support.v4.find
+import org.jetbrains.anko.support.v4.longToast
 import org.jetbrains.anko.support.v4.toast
 
 
@@ -41,22 +43,25 @@ class ProfileFragment : Fragment() {
         txtEmail = find(R.id.emailEditText)
         txtName = find(R.id.nameEditText)
         txtPhone = find(R.id.phoneEditText)
-        currentPW = find(R.id.editCurrentPassword)
         btnSave = find(R.id.btnSave)
 
-        val currentUser = FirebaseAuth.getInstance().currentUser ?: throw AssertionError()
+        val currentUser = CustomerHolder.customer ?: throw AssertionError()
 
 
-        if (!currentUser.displayName.isNullOrBlank()) {
-            nameEditText.setText(currentUser.displayName)
-        }
-        if (!currentUser.email.isNullOrBlank()) {
-            emailEditText.setText(currentUser.email)
-        }
-        if (!currentUser.phoneNumber.isNullOrBlank()) {
-            phoneEditText.setText(currentUser.phoneNumber)
-        }
+        nameEditText.setText(currentUser.name)
+        emailEditText.setText(currentUser.email)
+        phoneEditText.setText(currentUser.mobile)
+
         //TODO add current password, and/or validate password if changed
+        resetPassword.onClick {
+            FirebaseAuth.getInstance().sendPasswordResetEmail(currentUser.email).addOnCompleteListener {
+                if (it.isSuccessful) {
+                    longToast("Please check your email for instructions to reset your password")
+                } else {
+                    longToast("Error: ${it.exception?.message}")
+                }
+            }
+        }
 
         btnSave.onClick {
             val name = nameEditText.text.toString().let {
@@ -83,35 +88,19 @@ class ProfileFragment : Fragment() {
                 it
             }
 
-//            val uid = intent.extras.getString("id")
-//            val customer =
-//                    Customer(id = uid, name = name, email = email, mobile = mobile, favoriteCleaners = listOf(), favoriteLocations = listOf())
-//            val task = FirebaseDatabase.getInstance().getReference("/customers/" + uid).setValue(customer.toMap())
-//            task.addOnCompleteListener {
-//                if (it.isSuccessful) {
-//                    startActivity<TestingActivity>()
-//                } else {
-//                    toast("Exception occurred: " + it.exception?.message)
-//
-//                }
+            val uid = currentUser.id
+            val customer = currentUser.copy(name = name, mobile = mobile, email = email)
+            val task = FirebaseDatabase.getInstance().getReference("/customers/" + uid).setValue(customer.toMap())
+            task.addOnCompleteListener {
+                if (it.isSuccessful) {
+                    toast("Your profile was updated successfully")
+                    CustomerHolder.customer = customer
+                } else {
+                    toast("Error: " + it.exception?.message)
+                }
+            }
         }
     }
-
-
-//
-//    private fun toMap(): Map<String, Any> {
-//        val map = mutableMapOf<String, Any>()
-//
-//        map.put("name", txtName)
-//        map.put("email", txtEmail)
-//        map.put("mobile", txtPhone)
-//
-//        return map
-//    }
-//
-//    fun pushUser(user: ProfileFragment) {
-//        FirebaseDatabase.getInstance().getReference("/customers").push().setValue(user.toMap())
-//    }
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)

@@ -5,6 +5,7 @@ buildscript {
     ext.kotlinx_coroutines_version = '0.19.3'
     ext.anko_version = '0.10.2'
     ext.support_library_version = '27.0.2'
+    ext.firebase_version = '11.6.2'
 
     repositories {
         google()

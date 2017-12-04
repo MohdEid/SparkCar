@@ -38,4 +38,8 @@
         android:id="@+id/id_sign_out"
         android:actionMenuTextColor="#FF0000"
         android:title="@string/sign_out" />
+    <item
+        android:id="@+id/id_sign_in"
+        android:actionMenuTextColor="#FF0000"
+        android:title="@string/sign_in"/>
 </menu>

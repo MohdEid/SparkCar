@@ -22,7 +22,6 @@ import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.widget.Toast
 import com.example.notebookpc.sparkcar.data.Cleaner
-import com.example.notebookpc.sparkcar.data.Users
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -348,7 +347,7 @@ class MainActivity : AppCompatActivity(),
             when ((task.exception as ApiException).statusCode) {
                 CommonStatusCodes.RESOLUTION_REQUIRED -> {
                     (task.exception as ResolvableApiException)
-                            .startResolutionForResult(this@MainActivity, TestingActivity.REQUEST_CODE_LOCATION_SETTINGS)
+                            .startResolutionForResult(this@MainActivity, TestingActivity.RC_LOCATION_SETTINGS)
                 }
             }
         }
@@ -450,7 +449,6 @@ class MainActivity : AppCompatActivity(),
                             if (snapshot == null || snapshot.value == null) {
                                 startActivityForResult<SignUpActivity>(RC_SIGN_UP, "id" to uid)
                             } else {
-                                val user = Users.fromSnapshot(snapshot) ?: throw AssertionError()
                                 toast("User was signed up already")
                             }
                         }

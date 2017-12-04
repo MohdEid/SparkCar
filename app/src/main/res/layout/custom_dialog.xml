@@ -1,23 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/txtCleanerName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="35dp"
-        android:layout_marginTop="10dp"
-        android:text="Cleaner name:"
-        android:textSize="18sp"/>
 
     <TextView
         android:id="@+id/txtMobile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/txtCleanerName"
-        android:layout_marginStart="35dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
         android:text="@string/mobile_number"
         android:textSize="18sp"/>
 
@@ -26,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/txtMobile"
-        android:layout_marginStart="35dp"
+        android:layout_marginStart="32dp"
         android:text="Busy"
         android:textSize="18sp"/>
 
@@ -38,5 +30,5 @@
         android:layout_centerInParent="true"
         android:layout_marginTop="12dp"
         android:isIndicator="true"
-        android:numStars="5" />
+        android:numStars="5"/>
 </RelativeLayout>

@@ -56,6 +56,10 @@
         <activity android:name=".MainActivity"/>
         <activity android:name=".OrdersActivity"/>
         <activity android:name=".SignUpActivity"/>
+        <activity
+            android:name=".PickLocationActivity"
+            android:label="@string/title_activity_pick_location">
+        </activity>
     </application>
 
 </manifest>
