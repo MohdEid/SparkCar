@@ -1,5 +1,6 @@
 package com.example.notebookpc.sparkcar
 
+import android.arch.lifecycle.Observer
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
@@ -9,7 +10,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.notebookpc.sparkcar.adapters.FavoritesAdapter
+import com.example.notebookpc.sparkcar.adapters.FavoriteCleanersAdapter
+import com.example.notebookpc.sparkcar.data.Id
 import kotlinx.android.synthetic.main.fragment_favorite.*
 
 // TODO add listener for clicking on items
@@ -31,13 +33,16 @@ class FavoriteCleanersFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val customer = CustomerHolder.customer ?: throw AssertionError()
-        favoritesList = customer.favoriteCleaners
-
-        val adapter = FavoritesAdapter(favoritesList)
         favoriteCleanersRecyclerView.layoutManager = LinearLayoutManager(activity)
-        favoriteCleanersRecyclerView.adapter = adapter
         favoriteCleanersRecyclerView.addItemDecoration(DividerItemDecoration(activity, LinearLayoutManager.VERTICAL))
+
+        CustomerHolder.customer.observe(this, Observer { currentCustomer ->
+            favoritesList = currentCustomer?.favoriteCleaners ?: throw IllegalStateException()
+
+            val adapter = FavoriteCleanersAdapter(favoritesList)
+            favoriteCleanersRecyclerView.adapter = adapter
+        })
+
     }
 
     override fun onAttach(context: Context?) {

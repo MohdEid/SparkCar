@@ -26,7 +26,6 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_pick_location.*
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.android.UI
@@ -41,7 +40,6 @@ class PickLocationActivity : AppCompatActivity(), OnMapReadyCallback, AnkoLogger
         private val REQUEST_CODE_LOCATION_SETTINGS: Int = 11
     }
 
-    private lateinit var favoritesList: List<Id>
     private lateinit var map: GoogleMap
 
 
@@ -71,22 +69,22 @@ class PickLocationActivity : AppCompatActivity(), OnMapReadyCallback, AnkoLogger
                 lateinit var nameEditText: EditText
                 customView {
                     linearLayout {
+                        lparams(width = matchParent, height = wrapContent)
                         orientation = LinearLayout.HORIZONTAL
 
                         textView {
                             text = "Enter location name: "
                         }
-                        nameEditText = editText {}
+                        nameEditText = editText { }.lparams {
+                            weight = 1f
+                        }
                     }
                 }
                 okButton {
-                    val uid = CustomerHolder.customer?.id ?: throw IllegalStateException()
-                    val locationReference = FirebaseDatabase.getInstance().getReference("/customers/$uid/favorite_locations")
-
-                    locationReference.push().setValue(FavoriteLocation(nameEditText.text.toString(), favoriteLocation))
+                    val location = FavoriteLocation(nameEditText.text.toString(), favoriteLocation)
+                    CustomerHolder.addFavoriteLocation(location)
                     finish()
                 }
-
             }.show()
         }
 

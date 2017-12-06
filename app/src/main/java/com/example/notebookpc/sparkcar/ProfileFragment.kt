@@ -1,5 +1,6 @@
 package com.example.notebookpc.sparkcar
 
+import android.arch.lifecycle.Observer
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
@@ -7,13 +8,9 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.fragment_profile.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
-import org.jetbrains.anko.support.v4.find
 import org.jetbrains.anko.support.v4.longToast
 import org.jetbrains.anko.support.v4.toast
 
@@ -23,12 +20,7 @@ class ProfileFragment : Fragment() {
 
     private var mListener: OnFragmentInteractionListener? = null
 
-    //declaration of layout variables
-    private lateinit var txtName: TextView
-    private lateinit var txtEmail: TextView
-    private lateinit var txtPhone: TextView
-    private lateinit var currentPW: TextView
-    private lateinit var btnSave: Button
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -40,21 +32,22 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        txtEmail = find(R.id.emailEditText)
-        txtName = find(R.id.nameEditText)
-        txtPhone = find(R.id.phoneEditText)
-        btnSave = find(R.id.btnSave)
 
-        val currentUser = CustomerHolder.customer ?: throw AssertionError()
+        val currentUser = CustomerHolder.customer
 
 
-        nameEditText.setText(currentUser.name)
-        emailEditText.setText(currentUser.email)
-        phoneEditText.setText(currentUser.mobile)
+        currentUser.observe(this, Observer {
+            val value = it ?: throw IllegalStateException()
+            nameEditText.setText(value.name)
+            emailEditText.setText(value.email)
+            phoneEditText.setText(value.mobile)
+        })
 
         //TODO add current password, and/or validate password if changed
         resetPassword.onClick {
-            FirebaseAuth.getInstance().sendPasswordResetEmail(currentUser.email).addOnCompleteListener {
+            val customerValue = currentUser.value ?: throw IllegalStateException()
+            val email = customerValue.email
+            FirebaseAuth.getInstance().sendPasswordResetEmail(email).addOnCompleteListener {
                 if (it.isSuccessful) {
                     longToast("Please check your email for instructions to reset your password")
                 } else {
@@ -88,15 +81,13 @@ class ProfileFragment : Fragment() {
                 it
             }
 
-            val uid = currentUser.id
-            val customer = currentUser.copy(name = name, mobile = mobile, email = email)
-            val task = FirebaseDatabase.getInstance().getReference("/customers/" + uid).setValue(customer.toMap())
-            task.addOnCompleteListener {
+            val customerValue = currentUser.value ?: throw IllegalStateException()
+            val customer = customerValue.copy(name = name, mobile = mobile, email = email)
+            CustomerHolder.updateCustomer(customer) {
                 if (it.isSuccessful) {
-                    toast("Your profile was updated successfully")
-                    CustomerHolder.customer = customer
+                    toast("Profile updated successfully")
                 } else {
-                    toast("Error: " + it.exception?.message)
+                    toast("Update failed: ${it.exception?.message}")
                 }
             }
         }

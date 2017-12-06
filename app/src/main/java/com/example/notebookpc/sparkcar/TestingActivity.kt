@@ -24,7 +24,7 @@ import android.widget.RatingBar
 import android.widget.TextView
 import android.widget.Toast
 import com.example.notebookpc.sparkcar.data.Cleaner
-import com.example.notebookpc.sparkcar.data.Customer
+import com.example.notebookpc.sparkcar.data.Id
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -42,8 +42,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import org.jetbrains.anko.*
 
-typealias Id = String
-
 class TestingActivity : AppCompatActivity(),
         AnkoLogger,
         OnMapReadyCallback,
@@ -53,7 +51,7 @@ class TestingActivity : AppCompatActivity(),
         MessagesFragment.OnFragmentInteractionListener,
         ProfileFragment.OnFragmentInteractionListener,
         FavoriteCleanersFragment.OnFragmentInteractionListener,
-        LocationFragment.OnFragmentInteractionListener,
+        FavoriteLocationsFragment.OnFragmentInteractionListener,
         CarsFragment.OnFragmentInteractionListener,
         AboutFragment.OnFragmentInteractionListener,
         ShareFragment.OnFragmentInteractionListener {
@@ -72,7 +70,7 @@ class TestingActivity : AppCompatActivity(),
     internal val carsFragment = CarsFragment.newInstance()
     internal val aboutFragment = AboutFragment.newInstance()
     internal val favoriteCleanersFragment: Fragment = FavoriteCleanersFragment.newInstance()
-    internal val locationFragment = LocationFragment.newInstance()
+    internal val locationFragment = FavoriteLocationsFragment.newInstance()
 
     //GoogleMaps Initialization
     private lateinit var map: GoogleMap
@@ -124,23 +122,26 @@ class TestingActivity : AppCompatActivity(),
         setContentView(R.layout.activity_testing)
 
         //TODO fix race condition
-        if (firebaseAuth.currentUser != null) {
-
-            val uid = firebaseAuth.currentUser?.uid ?: throw AssertionError()
-            customersReference.child(uid).addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onCancelled(p0: DatabaseError?) {
-                    toast("There is an error")
-                }
-
-                override fun onDataChange(snapshot: DataSnapshot?) {
-                    if (snapshot == null || snapshot.value == null) {
-                        signOut()
-                    } else {
-                        CustomerHolder.customer = Customer.newCustomer(snapshot)
-                    }
-                }
-            })
+        if (firebaseAuth.currentUser != null && CustomerHolder.customer.value == null) {
+            CustomerHolder.signOut(this)
         }
+
+//
+//            val uid = firebaseAuth.currentUser?.uid ?: throw AssertionError()
+//            customersReference.child(uid).addListenerForSingleValueEvent(object : ValueEventListener {
+//                override fun onCancelled(p0: DatabaseError?) {
+//                    toast("There is an error")
+//                }
+//
+//                override fun onDataChange(snapshot: DataSnapshot?) {
+//                    if (snapshot == null || snapshot.value == null) {
+//                        signOut()
+//                    } else {
+//                        CustomerHolder.customer = Customer.newCustomer(snapshot)
+//                    }
+//                }
+//            })
+//        }
 
 
         //instantiating NavigationDrawer
@@ -383,7 +384,12 @@ class TestingActivity : AppCompatActivity(),
                     }
                 }
                 negativeButton("Cancel") {}
-                neutralPressed("favorite") {}
+                neutralPressed("favorite") {
+                    val task = CustomerHolder.addFavoriteCleaner(cleanerTag.id)
+                    task.addOnCompleteListener {
+                        toast("Added successfully")
+                    }
+                }
             }.show()
         }
         map.setOnMarkerClickListener { marker ->
@@ -497,8 +503,6 @@ class TestingActivity : AppCompatActivity(),
                         override fun onDataChange(snapshot: DataSnapshot?) {
                             if (snapshot == null || snapshot.value == null) {
                                 startActivityForResult<SignUpActivity>(RC_SIGN_UP, "id" to uid)
-                            } else {
-                                CustomerHolder.customer = Customer.newCustomer(snapshot)
                             }
                         }
                     })
@@ -512,7 +516,7 @@ class TestingActivity : AppCompatActivity(),
                     longToast("Thank you for signing up")
                 } else {
                     longToast("Sign up failed")
-                    signOut()
+                    CustomerHolder.signOut(this)
                 }
             }
 
@@ -520,10 +524,5 @@ class TestingActivity : AppCompatActivity(),
                 super.onActivityResult(requestCode, resultCode, data)
             }
         }
-    }
-
-    private fun signOut() {
-        AuthUI.getInstance().signOut(this)
-        CustomerHolder.customer = null
     }
 }

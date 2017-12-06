@@ -22,6 +22,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.widget.Toast
 import com.example.notebookpc.sparkcar.data.Cleaner
+import com.example.notebookpc.sparkcar.data.Id
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -51,7 +52,7 @@ class MainActivity : AppCompatActivity(),
         MessagesFragment.OnFragmentInteractionListener,
         ProfileFragment.OnFragmentInteractionListener,
         FavoriteCleanersFragment.OnFragmentInteractionListener,
-        LocationFragment.OnFragmentInteractionListener,
+        FavoriteLocationsFragment.OnFragmentInteractionListener,
         CarsFragment.OnFragmentInteractionListener,
         AboutFragment.OnFragmentInteractionListener,
         ShareFragment.OnFragmentInteractionListener {
@@ -70,7 +71,7 @@ class MainActivity : AppCompatActivity(),
     internal val carsFragment = CarsFragment.newInstance()
     internal val aboutFragment = AboutFragment.newInstance()
     internal val favoriteCleanersFragment: Fragment = FavoriteCleanersFragment.newInstance()
-    internal val locationFragment = LocationFragment.newInstance()
+    internal val locationFragment = FavoriteLocationsFragment.newInstance()
 
     //GoogleMaps Initialization
     private lateinit var map: GoogleMap

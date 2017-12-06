@@ -1,5 +1,6 @@
 package com.example.notebookpc.sparkcar
 
+import android.arch.lifecycle.Observer
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
@@ -10,13 +11,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.notebookpc.sparkcar.adapters.FavoriteLocationsAdapter
-import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.fragment_location.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.support.v4.startActivity
 
 
-class LocationFragment : Fragment() {
+class FavoriteLocationsFragment : Fragment() {
 
 
     private var mListener: OnFragmentInteractionListener? = null
@@ -30,14 +30,16 @@ class LocationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         addLocationBtn.onClick {
-            FirebaseDatabase.getInstance().getReference("/locations")
             startActivity<PickLocationActivity>()
         }
-        val favoritesList = CustomerHolder.customer?.favoriteLocations ?: throw AssertionError()
-        locationsRcyclerView.adapter = FavoriteLocationsAdapter(favoritesList)
+
         locationsRcyclerView.layoutManager = LinearLayoutManager(activity)
         locationsRcyclerView.addItemDecoration(DividerItemDecoration(activity, LinearLayoutManager.VERTICAL))
 
+        CustomerHolder.customer.observe(this, Observer { currentCustomer ->
+            val favoritesList = currentCustomer?.favoriteLocations ?: throw IllegalStateException()
+            locationsRcyclerView.adapter = FavoriteLocationsAdapter(favoritesList)
+        })
     }
 
 
@@ -63,8 +65,8 @@ class LocationFragment : Fragment() {
 
     companion object {
 
-        fun newInstance(): LocationFragment {
-            return LocationFragment()
+        fun newInstance(): FavoriteLocationsFragment {
+            return FavoriteLocationsFragment()
         }
     }
 }// Required empty public constructor
