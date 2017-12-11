@@ -1,9 +1,7 @@
 package com.example.notebookpc.sparkcar.data
 
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.tasks.Task
 import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.FirebaseDatabase
 
 data class Customer(
         val id: Id,
@@ -11,7 +9,8 @@ data class Customer(
         val name: String,
         val email: String,
         val favoriteLocations: List<FavoriteLocation>,
-        val favoriteCleaners: List<Id>
+        val favoriteCleaners: List<Id>,
+        val cars: List<Car>
 ) {
     companion object {
         fun newCustomer(dataSnapshot: DataSnapshot?): Customer {
@@ -24,12 +23,16 @@ data class Customer(
             val favoriteLocationsIterable = snapshot.child("favorite_locations").children ?: throw AssertionError("child not expected to be null")
             val favoriteCleaners = mutableListOf<Id>()
             val favoriteLocations = mutableListOf<FavoriteLocation>()
-
             for (locationSnapshot in favoriteLocationsIterable) {
                 val lat = locationSnapshot.child("lat").getValue(Double::class.java) ?: throw AssertionError("child not expected to be null")
                 val lon = locationSnapshot.child("lon").getValue(Double::class.java) ?: throw AssertionError("child not expected to be null")
                 val locationName = locationSnapshot.child("name").getValue(String::class.java) ?: throw AssertionError("child not expected to be null")
                 favoriteLocations.add(FavoriteLocation(locationName, LatLng(lat, lon)))
+            }
+            val carsSnapshot = snapshot.child("cars_list") ?: throw AssertionError("child is not expected to be null")
+            val cars = mutableListOf<Car>()
+            for (carSnapshot in carsSnapshot.children) {
+                cars.add(Car.newCar(carSnapshot))
             }
             for (cleanerSnapshot in favoriteCleanersIterable) {
                 val cleanerId = cleanerSnapshot.getValue(Id::class.java) ?: throw AssertionError("child not expected to be null")
@@ -37,8 +40,7 @@ data class Customer(
                 favoriteCleaners.add(cleanerId)
             }
 
-
-            return Customer(id = id, name = name, mobile = mobile, email = email, favoriteLocations = favoriteLocations, favoriteCleaners = favoriteCleaners)
+            return Customer(id = id, name = name, mobile = mobile, email = email, favoriteLocations = favoriteLocations, favoriteCleaners = favoriteCleaners, cars = cars)
         }
     }
 
@@ -48,13 +50,11 @@ data class Customer(
         map["name"] = name
         map["mobile"] = mobile
         map["email"] = email
-        map["favorite_locations"] = favoriteLocations
+        val favoriteLocationsList = favoriteLocations.map { it.toMap() }
+        map["favorite_locations"] = favoriteLocationsList
         map["favorite_cleaners"] = favoriteCleaners
+        map["cars_list"] = cars.map { it.toMap() }
 
         return map
     }
-
-    fun pushToDatabase(): Task<Void> =
-            FirebaseDatabase.getInstance().getReference("/customers/$id").setValue(this.toMap())
-
 }

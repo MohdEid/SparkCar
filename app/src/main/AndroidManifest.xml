@@ -60,6 +60,8 @@
             android:name=".PickLocationActivity"
             android:label="@string/title_activity_pick_location">
         </activity>
+        <activity android:name=".SaveCarActivity">
+        </activity>
     </application>
 
 </manifest>

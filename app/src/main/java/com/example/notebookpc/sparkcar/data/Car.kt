@@ -1,14 +1,34 @@
 package com.example.notebookpc.sparkcar.data
 
+import com.google.firebase.database.DataSnapshot
+
 /**
  * Created by NOTEBOOK pC on 11/25/2017.
  */
 data class Car(
 
-        private val id: String,
-        private val ownerId: String,
-        private val name: String,
-        private val carPlate: String,
-        private val color: String)
+        val name: String,
+        val carPlate: String,
+        val color: String) {
+    fun toMap(): Map<String, Any> {
+        val map = mutableMapOf<String, Any>()
+
+        map["name"] = name
+        map["car_plate"] = carPlate
+        map["color"] = color
+
+        return map
+    }
+
+    companion object {
+        fun newCar(snapshot: DataSnapshot): Car {
+            val name = snapshot.child("name").getValue(String::class.java) ?: throw AssertionError("child not expected to be null")
+            val plate = snapshot.child("car_plate").getValue(String::class.java) ?: throw AssertionError("child not expected to be null")
+            val color = snapshot.child("color").getValue(String::class.java) ?: throw AssertionError("child not expected to be null")
+            return Car(name, plate, color)
+        }
+    }
+
+}
 
    

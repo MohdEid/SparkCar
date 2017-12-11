@@ -42,6 +42,7 @@
     <string name="name">Name:</string>
     <string name="car_plate">Car Plate</string>
     <string name="car_color">Car Color:</string>
+    <string name="car_model">Car Model</string>
     <string name="set_pickup_location">Set your new cleaning location</string>
     <string name="delivery_point">Cleaning Point</string>
 
@@ -63,4 +64,6 @@
     <string name="title_activity_pick_location">Map</string>
     <string name="add_location">Add</string>
     <string name="please_long_click_location">Hold to set Location</string>
+    <string name="color">Color</string>
+    <string name="add_car">Add Car</string>
 </resources>

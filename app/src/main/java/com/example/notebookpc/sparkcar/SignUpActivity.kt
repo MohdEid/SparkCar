@@ -56,7 +56,7 @@ class SignUpActivity : AppCompatActivity() {
 
             val uid = intent.extras.getString("id")
             val customer = Customer(id = uid, name = name, email = email, mobile = mobile,
-                    favoriteCleaners = listOf(), favoriteLocations = listOf())
+                    favoriteCleaners = listOf(), favoriteLocations = listOf(), cars = listOf())
             CustomerHolder.updateCustomer(customer) { task ->
                 task.addOnCompleteListener {
                     if (it.isSuccessful) {

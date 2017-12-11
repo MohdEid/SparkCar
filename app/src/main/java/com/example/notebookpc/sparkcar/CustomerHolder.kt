@@ -3,6 +3,7 @@ package com.example.notebookpc.sparkcar
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.support.v4.app.FragmentActivity
+import com.example.notebookpc.sparkcar.data.Car
 import com.example.notebookpc.sparkcar.data.Customer
 import com.example.notebookpc.sparkcar.data.FavoriteLocation
 import com.example.notebookpc.sparkcar.data.Id
@@ -79,5 +80,11 @@ internal object CustomerHolder : AnkoLogger {
         val uid = customer.value!!.id
         val locationReference = FirebaseDatabase.getInstance().getReference("/customers/$uid/favorite_cleaners")
         return locationReference.push().setValue(cleanerId)
+    }
+
+    fun addCar(car: Car): Task<Void> {
+        val id = customer.value!!.id
+        val carRefrence = FirebaseDatabase.getInstance().getReference("/customers/$id/cars_list")
+        return carRefrence.push().setValue(car.toMap())
     }
 }
