@@ -2,23 +2,11 @@ package com.example.notebookpc.sparkcar.data
 
 import com.google.firebase.database.DataSnapshot
 
-/**
- * Created by NOTEBOOK pC on 11/25/2017.
- */
-data class Car(
 
+data class Car(
         val name: String,
         val carPlate: String,
         val color: String) {
-    fun toMap(): Map<String, Any> {
-        val map = mutableMapOf<String, Any>()
-
-        map["name"] = name
-        map["car_plate"] = carPlate
-        map["color"] = color
-
-        return map
-    }
 
     companion object {
         fun newCar(snapshot: DataSnapshot): Car {
@@ -29,6 +17,15 @@ data class Car(
         }
     }
 
+    fun toMap(): Map<String, Any> {
+        val map = mutableMapOf<String, Any>()
+
+        map["name"] = name
+        map["car_plate"] = carPlate
+        map["color"] = color
+
+        return map
+    }
 }
 
    

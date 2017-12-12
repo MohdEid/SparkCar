@@ -66,4 +66,6 @@
     <string name="please_long_click_location">Hold to set Location</string>
     <string name="color">Color</string>
     <string name="add_car">Add Car</string>
+    <string name="total_cost">Total:      SAR %s</string>
+    <string name="confirm">Confirm</string>
 </resources>

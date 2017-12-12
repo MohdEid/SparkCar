@@ -41,6 +41,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import org.jetbrains.anko.*
+import java.io.Serializable
 
 class TestingActivity : AppCompatActivity(),
         AnkoLogger,
@@ -284,7 +285,7 @@ class TestingActivity : AppCompatActivity(),
                           val message: String,
                           val mobile: String,
                           val rating: Float,
-                          val isAvailable: Boolean)
+                          val isAvailable: Boolean) : Serializable
 
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
