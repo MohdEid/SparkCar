@@ -1,0 +1,42 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="com.example.notebookpc.sparkcar.ShareFragment">
+
+
+    <TextView
+        android:id="@+id/txtViewShare"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="169dp"
+        android:text="@string/share_this_at"/>
+
+    <Button
+        android:id="@+id/btnFacebook"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtViewShare"
+        android:layout_toStartOf="@+id/txtViewShare"
+        android:text="@string/facebook"/>
+
+    <Button
+        android:id="@+id/btnWhatsapp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/btnFacebook"
+        android:layout_alignBottom="@+id/btnFacebook"
+        android:layout_centerHorizontal="true"
+        android:text="@string/whatsapp"/>
+
+    <Button
+        android:id="@+id/btnPhone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/btnWhatsapp"
+        android:layout_toEndOf="@+id/txtViewShare"
+        android:text="@string/phone"/>
+
+</RelativeLayout>

@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">SparkCarCleaner</string>
+    <string name="title_activity_main">Spark Car Cleaner</string>
+    <string name="confirm">confirm</string>
+    <string name="total_cost">total cost: SAR %s</string>
+    <string name="this_is_a_test_application_on_the_cleaner_side">this is a test application on the cleaner side</string>
+    <string name="your_name">your name</string>
+    <string name="mobile_number">mobile number</string>
+    <string name="enter_your_email">enter your email</string>
+    <string name="save">save</string>
+    <string name="reset_password">Reset Password</string>
+    <string name="share_this_at">share this at</string>
+    <string name="facebook">facebook</string>
+    <string name="whatsapp">whatsapp</string>
+    <string name="phone">phone</string>
+    <string name="user_profile_picture">user profile picture</string>
+    <string name="user_name">user_name</string>
+    <string name="user_mobile_number">user mobile number</string>
+</resources>
