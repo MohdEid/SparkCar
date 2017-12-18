@@ -1,21 +1,26 @@
 package com.example.notebookpc.sparkcarcleaner
 
 import android.content.Context
-import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
+
 class MessagesFragment : Fragment() {
 
+    // TODO: Rename and change types of parameters
+    private var mParam1: String? = null
+    private var mParam2: String? = null
+
     private var mListener: OnFragmentInteractionListener? = null
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_messages, container, false)
+        return inflater.inflate(R.layout.fragment_messages2, container, false)
     }
 
     override fun onAttach(context: Context?) {
@@ -32,16 +37,13 @@ class MessagesFragment : Fragment() {
         mListener = null
     }
 
-
-    interface OnFragmentInteractionListener {
-
-        fun onFragmentInteraction(uri: Uri)
-    }
+    interface OnFragmentInteractionListener
 
     companion object {
 
         fun newInstance(): MessagesFragment {
-            return MessagesFragment()
+            val fragment = MessagesFragment()
+            return fragment
         }
     }
 }// Required empty public constructor

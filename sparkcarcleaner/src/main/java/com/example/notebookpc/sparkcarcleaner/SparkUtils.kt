@@ -28,15 +28,6 @@ internal fun MainActivity.selectNavigationItem(item: MenuItem) {
         R.id.id_profile -> {
             replaceFragment(profileFragment)
         }
-        R.id.id_favorite_cleaner -> {
-            replaceFragment(favoriteCleanersFragment)
-        }
-        R.id.id_location -> {
-            replaceFragment(locationFragment)
-        }
-        R.id.id_car -> {
-            replaceFragment(carsFragment)
-        }
         R.id.id_about -> {
             replaceFragment(aboutFragment)
         }

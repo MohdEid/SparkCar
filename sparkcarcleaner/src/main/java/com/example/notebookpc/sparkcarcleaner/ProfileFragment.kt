@@ -2,7 +2,6 @@ package com.example.notebookpc.sparkcarcleaner
 
 import android.arch.lifecycle.Observer
 import android.content.Context
-import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -17,22 +16,17 @@ import org.jetbrains.anko.support.v4.toast
 
 class ProfileFragment : Fragment() {
 
-
     private var mListener: OnFragmentInteractionListener? = null
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-
-
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_profile, container, false)
     }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val currentUser = CustomerHolder.customer
+        val currentUser = CleanerHolder.cleaner
 
 
         //TODO add a picture for the user to use
@@ -44,8 +38,8 @@ class ProfileFragment : Fragment() {
         })
 
         resetPassword.onClick {
-            val customerValue = currentUser.value ?: throw IllegalStateException()
-            val email = customerValue.email
+            val cleanerValue = currentUser.value ?: throw IllegalStateException()
+            val email = cleanerValue.email
             FirebaseAuth.getInstance().sendPasswordResetEmail(email).addOnCompleteListener {
                 if (it.isSuccessful) {
                     longToast("Please check your email for instructions to reset your password")
@@ -80,9 +74,9 @@ class ProfileFragment : Fragment() {
                 it
             }
 
-            val customerValue = currentUser.value ?: throw IllegalStateException()
-            val customer = customerValue.copy(name = name, mobile = mobile, email = email)
-            CustomerHolder.updateCustomer(customer) {
+            val cleanerValue = currentUser.value ?: throw IllegalStateException()
+            val cleaner = cleanerValue.copy(name = name, mobile = mobile, email = email)
+            CleanerHolder.updateCleaner(cleaner) {
                 if (it.isSuccessful) {
                     toast("Profile updated successfully")
                 } else {
@@ -106,14 +100,13 @@ class ProfileFragment : Fragment() {
         mListener = null
     }
 
-    interface OnFragmentInteractionListener {
-
-        fun onFragmentInteraction(uri: Uri)
-    }
+    interface OnFragmentInteractionListener
 
     companion object {
+
+
         fun newInstance(): ProfileFragment {
             return ProfileFragment()
         }
     }
-}
+}// Required empty public constructor

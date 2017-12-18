@@ -4,7 +4,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.database.DataSnapshot
 
 data class Orders(
-        val orderId: Id?,
+        val orderId: Id,
         val cleanerId: Id,
         val customerId: Id,
         val location: LatLng,
@@ -15,6 +15,7 @@ data class Orders(
 
         val STATUS_COMPLETE = "Completed"
         val STATUS_INCOMPLETE = "Not Finished"
+        val STATUS_INPROGRESS = "In-Progress"
 
         fun newOrder(orderSnapshot: DataSnapshot): Orders {
 

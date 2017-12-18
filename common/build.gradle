@@ -35,6 +35,7 @@ dependencies {
     implementation "com.google.android.gms:play-services-maps:$firebase_version"
     implementation "com.google.android.gms:play-services-location:$firebase_version"
 }
+//apply plugin: 'com.google.gms.google-services'
 repositories {
     mavenCentral()
 }

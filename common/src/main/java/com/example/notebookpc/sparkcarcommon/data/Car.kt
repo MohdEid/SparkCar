@@ -1,12 +1,13 @@
 package com.example.notebookpc.sparkcarcommon.data
 
 import com.google.firebase.database.DataSnapshot
+import java.io.Serializable
 
 
 data class Car(
         val name: String,
         val carPlate: String,
-        val color: String) {
+        val color: String) : Serializable {
 
     companion object {
         fun newCar(snapshot: DataSnapshot): Car {

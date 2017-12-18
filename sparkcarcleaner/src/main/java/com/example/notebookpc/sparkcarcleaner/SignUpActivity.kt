@@ -3,6 +3,8 @@ package com.example.notebookpc.sparkcarcleaner
 import android.app.Activity
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import com.example.notebookpc.sparkcarcommon.data.Cleaner
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_sign_up.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -56,9 +58,16 @@ class SignUpActivity : AppCompatActivity() {
             }
 
             val uid = intent.extras.getString("id")
-            val customer = Customer(id = uid, name = name, email = email, mobile = mobile,
-                    favoriteCleaners = listOf(), favoriteLocations = listOf(), cars = listOf())
-            CustomerHolder.updateCustomer(customer) { task ->
+            val cleaner = Cleaner(
+                    id = uid,
+                    name = name,
+                    email = email,
+                    mobile = mobile,
+                    location = LatLng(0.0, 0.0),
+                    rating = 1f,
+                    isAvailable = true
+            )
+            CleanerHolder.updateCleaner(cleaner) { task ->
                 task.addOnCompleteListener {
                     if (it.isSuccessful) {
                         setResult(RESULT_OK)

@@ -15,7 +15,7 @@ data class Cleaner(
     companion object {
         fun newCleaner(dataSnapshot: DataSnapshot?): Cleaner {
             val snapshot = dataSnapshot ?: throw AssertionError("Null child added to database")
-            val id = snapshot.child("id").getValue(Id::class.java) ?: throw AssertionError("child not expected to be null")
+            val id = snapshot.key ?: throw AssertionError("child not expected to be null")
             val lat = snapshot.child("location/lat").getValue(Double::class.java) ?: throw AssertionError("child not expected to be null")
             val lon = snapshot.child("location/lon").getValue(Double::class.java) ?: throw AssertionError("child not expected to be null")
             val location = LatLng(lat, lon)
@@ -27,5 +27,18 @@ data class Cleaner(
 
             return Cleaner(id = id, name = name, location = location, mobile = mobile, rating = rating, email = email, isAvailable = available)
         }
+    }
+
+    fun toMap(): Map<String, Any> {
+        val map = mutableMapOf<String, Any>()
+
+        map["name"] = name
+        map["mobile"] = mobile
+        map["email"] = email
+        map["rating"] = rating
+        map["location"] = mapOf("lat" to location.latitude, "lon" to location.longitude)
+        map["isAvailable"] = "Available"
+
+        return map
     }
 }

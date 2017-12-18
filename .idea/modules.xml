@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Customer/app.iml" filepath="$PROJECT_DIR$/Customer/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Customer/Customer.iml" filepath="$PROJECT_DIR$/Customer/Customer.iml" />
       <module fileurl="file://$PROJECT_DIR$/SparkCar.iml" filepath="$PROJECT_DIR$/SparkCar.iml" />
+      <module fileurl="file://D:\Dropbox\Projects\AndroidStudioProjects\MohammedEid\SparkCar\Customer\app.iml" filepath="D:\Dropbox\Projects\AndroidStudioProjects\MohammedEid\SparkCar\Customer\app.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
       <module fileurl="file://$PROJECT_DIR$/sparkcarcleaner/sparkcarcleaner.iml" filepath="$PROJECT_DIR$/sparkcarcleaner/sparkcarcleaner.iml" />
     </modules>

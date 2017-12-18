@@ -102,7 +102,6 @@ class MainActivity : AppCompatActivity(),
             markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
 
             currentLocationMarker = map.addMarker(markerOptions)
-            debug("current location: $latLng")
         }
     }
 

@@ -16,4 +16,26 @@
     <string name="user_profile_picture">user profile picture</string>
     <string name="user_name">user_name</string>
     <string name="user_mobile_number">user mobile number</string>
+    <string name="drawer_opened">Opened</string>
+    <string name="drawer_closed">Closed</string>
+    <!-- ... -->
+    <string name="facebook_application_id" translatable="false">515832225450570</string>
+    <!-- Facebook Application ID, prefixed by 'fb'.  Enables Chrome Custom tabs. -->
+    <string name="facebook_login_protocol_scheme" translatable="false">fb515832225450570</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="sign_out">Sign out</string>
+    <string name="Home">Home</string>
+    <string name="Messages">Messages</string>
+    <string name="Profile">Profile</string>
+    <string name="Social">Social</string>
+    <string name="About">About</string>
+    <string name="Share">Share</string>
+    <string name="sign_in">Sign in</string>
+    <string name="name">Name</string>
+    <string name="mobile">Mobile</string>
+    <string name="submit">Submit</string>
+    <string name="email">Email</string>
+    <string name="busy">Busy</string>
+    <string name="display_mobile_number">Mobile: %s</string>
 </resources>

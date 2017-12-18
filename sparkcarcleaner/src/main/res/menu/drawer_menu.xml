@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/id_home"
+
+            android:icon="@drawable/ic_home_black_48dp"
+            android:title="@string/Home"/>
+        <item
+            android:id="@+id/id_messages"
+            android:icon="@drawable/ic_message_black_48dp"
+            android:title="@string/Messages"/>
+        <item
+            android:id="@+id/id_profile"
+            android:title="@string/Profile"/>
+
+    </group>
+    <item android:title="@string/Social">
+        <menu>
+            <item
+                android:id="@+id/id_about"
+                android:icon="@drawable/blank_image"
+                android:title="@string/About"/>
+            <item
+                android:id="@+id/id_share"
+                android:title="@string/Share"/>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/id_sign_out"
+        android:actionMenuTextColor="#FF0000"
+        android:title="@string/sign_out"/>
+    <item
+        android:id="@+id/id_sign_in"
+        android:actionMenuTextColor="#FF0000"
+        android:title="@string/sign_in"/>
+</menu>
