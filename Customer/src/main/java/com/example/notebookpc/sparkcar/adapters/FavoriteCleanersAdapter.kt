@@ -1,6 +1,5 @@
 package com.example.notebookpc.sparkcar.adapters
 
-import android.annotation.SuppressLint
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -41,7 +40,7 @@ internal class CleanerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemV
         ratingTextView.text = ""
         availabilityTextView.text = ""
 
-        val reference = FirebaseDatabase.getInstance().getReference("/cleaners").orderByChild("id").equalTo(cleanerId)
+        val reference = FirebaseDatabase.getInstance().getReference("/cleaners/$cleanerId")
         if (listener != null) {
             reference.removeEventListener(listener)
         }
@@ -49,20 +48,17 @@ internal class CleanerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemV
             override fun onCancelled(p0: DatabaseError?) {
             }
 
-            @SuppressLint("StringFormatInvalid")
-            override fun onDataChange(p0: DataSnapshot?) {
-                for (snapshot in p0?.children ?: throw AssertionError()) {
-                    val cleaner = Cleaner.newCleaner(snapshot)
-                    nameTextView.text = nameTextView.context.getString(R.string.favorite_cleaner_list_item_name, cleaner.name)
-                    val rating = cleaner.rating
-                    if (rating < 0) {
-                        ratingTextView.text = nameTextView.context.getString(R.string.favorite_cleaner_unlist_item_rating)
+            override fun onDataChange(snapshot: DataSnapshot?) {
+                val cleaner = Cleaner.newCleaner(snapshot)
+                nameTextView.text = nameTextView.context.getString(R.string.favorite_cleaner_list_item_name, cleaner.name)
+                val rating = cleaner.rating
+                if (rating < 0) {
+                    ratingTextView.text = nameTextView.context.getString(R.string.favorite_cleaner_unlist_item_rating)
 
-                    } else {
-                        ratingTextView.text = nameTextView.context.getString(R.string.favorite_cleaner_list_item_rating, rating)
-                    }
-                    availabilityTextView.text = nameTextView.context.getString(R.string.favorite_cleaner_list_item_availability, cleaner.isAvailable)
+                } else {
+                    ratingTextView.text = nameTextView.context.getString(R.string.favorite_cleaner_list_item_rating, rating)
                 }
+                availabilityTextView.text = nameTextView.context.getString(R.string.favorite_cleaner_list_item_availability, cleaner.isAvailable)
             }
         }
         reference.addListenerForSingleValueEvent(listener)

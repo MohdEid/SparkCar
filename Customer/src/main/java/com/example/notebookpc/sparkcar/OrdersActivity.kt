@@ -48,7 +48,15 @@ class OrdersActivity : AppCompatActivity() {
                     .forEach { carInfo = it }
 
             val customerId = CustomerHolder.customer.value?.id ?: throw IllegalStateException()
-            val order = Orders(cleanerId = cleaner.id, location = currentLocation, car = carInfo, customerId = customerId, orderId = null, status = Orders.STATUS_INCOMPLETE)
+            val order = Orders(
+                    cleanerId = cleaner.id,
+                    location = currentLocation,
+                    car = carInfo,
+                    customerId = customerId,
+                    orderId = null,
+                    status = Orders.STATUS_INCOMPLETE,
+                    pictureUrl = null
+            )
             orderReference.push().setValue(order.toMap()).addOnCompleteListener {
 
                 if (it.isSuccessful) {

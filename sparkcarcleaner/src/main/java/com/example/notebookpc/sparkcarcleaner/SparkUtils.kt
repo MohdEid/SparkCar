@@ -28,6 +28,9 @@ internal fun MainActivity.selectNavigationItem(item: MenuItem) {
         R.id.id_profile -> {
             replaceFragment(profileFragment)
         }
+        R.id.pending_orders -> {
+            replaceFragment(pendingFragment)
+        }
         R.id.id_about -> {
             replaceFragment(aboutFragment)
         }

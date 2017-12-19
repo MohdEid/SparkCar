@@ -52,7 +52,8 @@ class MainActivity : AppCompatActivity(),
         ProfileFragment.OnFragmentInteractionListener,
         AboutFragment.OnFragmentInteractionListener,
         ShareFragment.OnFragmentInteractionListener,
-        MessagesFragment.OnFragmentInteractionListener {
+        MessagesFragment.OnFragmentInteractionListener,
+        PendingOrderFragment.OnFragmentInteractionListener {
 
 
     companion object {
@@ -67,6 +68,7 @@ class MainActivity : AppCompatActivity(),
     internal val shareFragment = ShareFragment.newInstance()
     internal val profileFragment = ProfileFragment.newInstance()
     internal val aboutFragment = AboutFragment.newInstance()
+    internal val pendingFragment = PendingOrderFragment.newInstance()
 
     internal val mapFragment = SupportMapFragment()
 
@@ -197,12 +199,14 @@ class MainActivity : AppCompatActivity(),
         val signOutItem = navigationView.menu.findItem(R.id.id_sign_out)
         val messagesItem = navigationView.menu.findItem(R.id.id_messages)
         val profileItem = navigationView.menu.findItem(R.id.id_profile)
+        val pendingItem = navigationView.menu.findItem(R.id.pending_orders)
         val signInItem = navigationView.menu.findItem(R.id.id_sign_in)
 
         if (firebaseAuth.currentUser != null) {
             signOutItem.isVisible = true
             messagesItem.isVisible = true
             profileItem.isVisible = true
+            pendingItem.isVisible = true
             signInItem.isVisible = false
             this.invalidateOptionsMenu()
         } else {
@@ -210,6 +214,7 @@ class MainActivity : AppCompatActivity(),
             signOutItem.isVisible = false
             messagesItem.isVisible = false
             profileItem.isVisible = false
+            pendingItem.isVisible = false
             this.invalidateOptionsMenu()
         }
     }
@@ -241,11 +246,9 @@ class MainActivity : AppCompatActivity(),
         orders.removeAll { it.orderId == order.orderId }
         ordersMarkers[order.orderId]?.remove() ?: throw AssertionError()
         ordersMarkers.remove(order.orderId)
-
     }
 
     private fun createSnippet(marker: Marker): String {
-        val lastLocation = lastLocation ?: return ""
         val orderTag = marker.tag as? OrderTag ?: return ""
         return " " + orderTag.id
     }
@@ -262,8 +265,9 @@ class MainActivity : AppCompatActivity(),
 
             snippet = createSnippet(this)
 
+            val id = order.orderId ?: throw IllegalStateException()
             tag = OrderTag(message = "OrderId: ${order.orderId}",
-                    isAvailable = order.status, id = order.orderId, car = order.car, customerId = order.customerId, title = order.cleanerId)
+                    status = order.status, id = id, car = order.car, customerId = order.customerId, title = order.cleanerId)
             if (isInfoWindowShown) {
                 hideInfoWindow()
                 showInfoWindow()
@@ -276,7 +280,7 @@ class MainActivity : AppCompatActivity(),
                         val car: Car,
                         val message: String,
                         val customerId: Id,
-                        val isAvailable: String) : Serializable
+                        val status: String) : Serializable
 
     /**
      * Manipulates the map once available.
@@ -293,7 +297,6 @@ class MainActivity : AppCompatActivity(),
             enableMyLocation()
         }
         map.uiSettings.isZoomControlsEnabled = true
-        val uid = FirebaseAuth.getInstance().currentUser?.uid
 
         //sets listener on the window of marker of a cleaner
         map.setOnInfoWindowClickListener { marker: Marker? ->
@@ -305,7 +308,7 @@ class MainActivity : AppCompatActivity(),
 
 
                     val isAvailableTextView = view.find<TextView>(R.id.txtActive)
-                    isAvailableTextView.text = if (orderTag.isAvailable == "Finished") "Finished" else "Not Finished"
+                    isAvailableTextView.text = if (orderTag.status == "Finished") "Finished" else "Not Finished"
 
                 }
                 positiveButton("Confirm Order") {
@@ -323,7 +326,7 @@ class MainActivity : AppCompatActivity(),
                         startActivityForResult(signInIntent, RC_SIGN_IN)
                     } else {
                         //loads the activity when the user is present
-                        startActivity<PendingOrderActivity>("cleaner" to orderTag)
+                        startActivity<CustomerOrderActivity>("order" to orderTag)
                         CleanerHolder.updateOrderStatus(orderTag.id, Orders.STATUS_INPROGRESS)
                     }
                 }
@@ -342,9 +345,10 @@ class MainActivity : AppCompatActivity(),
                 .title(order.orderId)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)))
         marker.snippet = createSnippet(marker)
-        marker.tag = OrderTag(title = order.orderId, message = createSnippet(marker), car = order.car,
-                customerId = order.customerId, isAvailable = order.status, id = order.customerId)
-        ordersMarkers.put(order.orderId, marker)
+        val title = order.customerId
+        marker.tag = OrderTag(title = title, message = createSnippet(marker), car = order.car,
+                customerId = order.customerId, status = order.status, id = order.orderId!!)
+        ordersMarkers.put(title, marker)
 
     }
 
