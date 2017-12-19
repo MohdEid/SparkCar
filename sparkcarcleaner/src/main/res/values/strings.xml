@@ -38,4 +38,12 @@
     <string name="email">Email</string>
     <string name="busy">Busy</string>
     <string name="display_mobile_number">Mobile: %s</string>
+    <string name="status_s">Status: %s</string>
+    <string name="order_of_customer">Order of Customer: %s</string>
+    <string name="customer_name_s">Customer Name: %s</string>
+    <string name="upload_picture">Upload Picture</string>
+    <string name="picture_status_s">Picture Status: %s</string>
+    <string name="confirm_task">Confirm Task</string>
+    <string name="pending_orders">Pending Orders</string>
+    <string name="picture_of_car_after_cleaning">Picture of car after cleaning</string>
 </resources>

@@ -2,14 +2,18 @@ package com.example.notebookpc.sparkcarcommon.data
 
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.database.DataSnapshot
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 
 data class Orders(
-        val orderId: Id,
+        val orderId: Id?,
         val cleanerId: Id,
         val customerId: Id,
         val location: LatLng,
         val car: Car,
-        val status: String
+        val status: String,
+        val pictureUrl: String? = null,
+        val date: DateTime = DateTime(DateTimeZone.getDefault())
 ) {
     companion object {
 
@@ -28,8 +32,11 @@ data class Orders(
             val status = orderSnapshot.child("status").getValue(String::class.java) ?: throw IllegalStateException()
             val location = LatLng(lat, lon)
             val car = Car.newCar(orderSnapshot.child("car"))
+            val dateString = orderSnapshot.child("order_date").getValue(String::class.java) ?: throw IllegalStateException()
+            val pictureUrl = orderSnapshot.child("picture_url").getValue(String::class.java)
+            val date = DateTime.parse(dateString).withZone(DateTimeZone.getDefault())
 
-            return Orders(orderId, cleanerId, customerId, location, car, status)
+            return Orders(orderId, cleanerId, customerId, location, car, status, pictureUrl, date)
         }
     }
 
@@ -41,7 +48,10 @@ data class Orders(
         map["location"] = mapOf("lat" to location.latitude, "lon" to location.longitude)
         map["car"] = car.toMap()
         map["status"] = status
+        map["order_date"] = date.withZone(DateTimeZone.UTC).toString()
+        if (pictureUrl != null) {
+            map["picture_url"] = pictureUrl
+        }
         return map
     }
-
 }

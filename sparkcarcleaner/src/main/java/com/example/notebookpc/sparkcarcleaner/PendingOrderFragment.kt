@@ -1,8 +1,7 @@
-package com.example.notebookpc.sparkcar
+package com.example.notebookpc.sparkcarcleaner
 
 import android.arch.lifecycle.Observer
 import android.content.Context
-import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.DividerItemDecoration
@@ -10,44 +9,34 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.notebookpc.sparkcar.adapters.FavoriteCarsAdapter
-import kotlinx.android.synthetic.main.favorite_car.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
-import org.jetbrains.anko.support.v4.startActivity
+import com.example.notebookpc.sparkcarcleaner.adapter.PendingOrdersAdapter
+import kotlinx.android.synthetic.main.activity_pending_order.*
 
-class CarsFragment : Fragment() {
-
-
+class PendingOrderFragment : Fragment() {
     private var mListener: OnFragmentInteractionListener? = null
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.favorite_car, container, false)
+        return inflater.inflate(R.layout.activity_pending_order, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        addCarBtn.onClick {
-            startActivity<SaveCarActivity>()
-        }
 
-        //TODO create listener on each car, to be able to delete or edit a car
-        carsRcyclerView.layoutManager = LinearLayoutManager(activity)
-        carsRcyclerView.addItemDecoration(DividerItemDecoration(activity, LinearLayoutManager.VERTICAL))
+        pendingOrdersRecyclerView.layoutManager = LinearLayoutManager(activity)
+        pendingOrdersRecyclerView.addItemDecoration(DividerItemDecoration(activity, LinearLayoutManager.VERTICAL))
 
-        CustomerHolder.customer.observe(this, Observer { currentCustomer ->
-            val listOfCars = currentCustomer?.cars
-            if (listOfCars == null) {
-                carsRcyclerView.adapter = null
+        CleanerHolder.orders.observe(this, Observer { ordersList ->
+            if (ordersList == null) {
+                pendingOrdersRecyclerView.adapter = null
                 return@Observer
             }
-            carsRcyclerView.adapter = FavoriteCarsAdapter(listOfCars)
+            val adapter = PendingOrdersAdapter(ordersList)
+            pendingOrdersRecyclerView.adapter = adapter
         })
     }
-
-
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
@@ -64,15 +53,14 @@ class CarsFragment : Fragment() {
     }
 
 
-    interface OnFragmentInteractionListener {
-
-        fun onFragmentInteraction(uri: Uri)
-    }
+    interface OnFragmentInteractionListener
 
     companion object {
 
-        fun newInstance(): CarsFragment {
-            return CarsFragment()
+        fun newInstance(): PendingOrderFragment {
+            val fragment = PendingOrderFragment()
+            return fragment
         }
     }
 }// Required empty public constructor
+

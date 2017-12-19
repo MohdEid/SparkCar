@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity(),
     internal val aboutFragment = AboutFragment.newInstance()
     internal val favoriteCleanersFragment: Fragment = FavoriteCleanersFragment.newInstance()
     internal val locationFragment = FavoriteLocationsFragment.newInstance()
-    internal val mapFragment = SupportMapFragment()
+    internal val mapFragment = SupportMapFragment.newInstance()
 
     //GoogleMaps Initialization
     private lateinit var map: GoogleMap
@@ -147,7 +147,8 @@ class MainActivity : AppCompatActivity(),
         navigationView = findViewById(R.id.navigation_view)
         navigationView.setNavigationItemSelectedListener(this)
 
-        updateSignOutItem()
+        // TODO remove this line
+//        updateSignOutItem()
 
         fused = LocationServices.getFusedLocationProviderClient(this)
 
@@ -175,9 +176,9 @@ class MainActivity : AppCompatActivity(),
         locationRequest.fastestInterval = 5000
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 
-        firebaseAuth.addAuthStateListener {
+        CustomerHolder.customer.observe(this, Observer {
             updateSignOutItem()
-        }
+        })
     }
 
     //updates the visibility of sign out in the menu when the user is signed in or not
@@ -192,7 +193,7 @@ class MainActivity : AppCompatActivity(),
 
 
 
-        if (firebaseAuth.currentUser != null) {
+        if (CustomerHolder.customer.value != null) {
             signOutItem.isVisible = true
             messagesItem.isVisible = true
             profileItem.isVisible = true
@@ -340,10 +341,6 @@ class MainActivity : AppCompatActivity(),
         if (checkLocationPermission()) {
             enableMyLocation()
         }
-
-
-        //add markers on the map
-
 
         //adds cleaners markers from database to the map
         val cleanersListener = object : ChildEventListener {
