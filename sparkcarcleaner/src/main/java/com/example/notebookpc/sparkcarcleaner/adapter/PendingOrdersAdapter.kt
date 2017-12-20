@@ -14,14 +14,14 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import org.joda.time.format.DateTimeFormat
 
-internal class PendingOrdersAdapter(private val orders: List<Orders>) : RecyclerView.Adapter<OrderViewHolder>() {
-    override fun onBindViewHolder(holder: OrderViewHolder?, position: Int) {
+internal class PendingOrdersAdapter(private val orders: List<Orders>) : RecyclerView.Adapter<PendingOrdersViewHolder>() {
+    override fun onBindViewHolder(holder: PendingOrdersViewHolder?, position: Int) {
         holder?.bind(orders[position])
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): OrderViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): PendingOrdersViewHolder {
         val itemView = LayoutInflater.from(parent?.context).inflate(R.layout.order_list_item, parent, false)
-        return OrderViewHolder(itemView)
+        return PendingOrdersViewHolder(itemView)
     }
 
     override fun getItemCount(): Int {
@@ -29,7 +29,7 @@ internal class PendingOrdersAdapter(private val orders: List<Orders>) : Recycler
     }
 }
 
-internal class OrderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+internal class PendingOrdersViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     val customerNameTextView: TextView = itemView.findViewById(R.id.customerNameTextView)
     val customerMobileTextView: TextView = itemView.findViewById(R.id.customerMobileTextView)

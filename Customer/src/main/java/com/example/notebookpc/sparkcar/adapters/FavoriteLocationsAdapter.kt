@@ -7,9 +7,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.example.notebookpc.sparkcarcommon.data.FavoriteLocation
 
-/**
- * Created by Mahdi on 2017-12-04.
- */
 internal class FavoriteLocationsAdapter(private val favoritesList: List<FavoriteLocation>) : RecyclerView.Adapter<FavouriteLocationViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): FavouriteLocationViewHolder {
         val layoutInflater = LayoutInflater.from(parent?.context)

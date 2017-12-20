@@ -38,7 +38,7 @@ class SaveCarActivity : AppCompatActivity() {
                 it
             }
 
-            CustomerHolder.addCar(Car(name, plate, color)).addOnCompleteListener {
+            CustomerHolder.addCar(Car(null, name, plate, color)).addOnCompleteListener {
                 if (it.isSuccessful) {
                     toast("Car added successfully")
                     finish()

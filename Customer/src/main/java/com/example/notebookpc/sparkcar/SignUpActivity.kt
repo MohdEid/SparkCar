@@ -29,7 +29,6 @@ class SignUpActivity : AppCompatActivity() {
         }
 
 
-        //TODO send email verification before executing the function
         //TODO do expression check before signing up
         submitButton.onClick {
             val name = nameEditText.text.toString().let {

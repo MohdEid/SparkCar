@@ -41,8 +41,7 @@ class AboutFragment : Fragment() {
     companion object {
 
         fun newInstance(): AboutFragment {
-            val fragment = AboutFragment()
-            return fragment
+            return AboutFragment()
         }
     }
 }// Required empty public constructor

@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/txtMobile"
         android:layout_marginStart="32dp"
-        android:text="Busy"
+        android:text="@string/busy"
         android:textSize="18sp"/>
 
     <RatingBar

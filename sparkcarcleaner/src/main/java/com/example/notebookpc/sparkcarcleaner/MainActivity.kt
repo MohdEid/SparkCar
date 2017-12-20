@@ -305,10 +305,8 @@ class MainActivity : AppCompatActivity(),
 
                 customView {
                     val view = include<View>(R.layout.custom_dialog)
-
-
                     val isAvailableTextView = view.find<TextView>(R.id.txtActive)
-                    isAvailableTextView.text = if (orderTag.status == "Finished") "Finished" else "Not Finished"
+                    isAvailableTextView.text = if (orderTag.status == "Finished") Orders.STATUS_COMPLETE else Orders.STATUS_INCOMPLETE
 
                 }
                 positiveButton("Confirm Order") {

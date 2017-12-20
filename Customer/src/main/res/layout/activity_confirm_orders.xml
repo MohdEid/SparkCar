@@ -5,7 +5,7 @@
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent"
                                              android:orientation="vertical"
-                                             tools:context="com.example.notebookpc.sparkcar.OrdersActivity">
+                                             tools:context="com.example.notebookpc.sparkcar.ConfirmOrderActivity">
 
     <TextView
         android:id="@+id/cleanerName"

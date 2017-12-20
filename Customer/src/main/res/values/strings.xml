@@ -69,4 +69,13 @@
     <string name="total_cost">Total:      SAR %s</string>
     <string name="confirm">Confirm</string>
     <string name="title_activity_cleaner">Map</string>
+    <string name="preview_orders">Preview Orders</string>
+    <string name="update">Update</string>
+    <string name="delete_this_car">Delete This Car</string>
+    <string name="mobile">Mobile</string>
+    <string name="submit">Submit</string>
+    <string name="busy">Busy</string>
+    <string name="reset_password">Reset Password</string>
+    <string name="from">From:</string>
+    <string name="enter_location_name">Enter location name:</string>
 </resources>

@@ -74,7 +74,7 @@ class PickLocationActivity : AppCompatActivity(), OnMapReadyCallback, AnkoLogger
                         orientation = LinearLayout.HORIZONTAL
 
                         textView {
-                            text = "Enter location name: "
+                            text = context.getString(R.string.enter_location_name)
                         }
                         nameEditText = editText { }.lparams {
                             weight = 1f

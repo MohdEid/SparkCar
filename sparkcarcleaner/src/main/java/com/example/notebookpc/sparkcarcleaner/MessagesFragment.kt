@@ -1,18 +1,19 @@
 package com.example.notebookpc.sparkcarcleaner
 
+import android.arch.lifecycle.Observer
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.DividerItemDecoration
+import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.notebookpc.sparkcarcleaner.adapter.MessagesAdapter
+import kotlinx.android.synthetic.main.fragment_messages.*
 
 
 class MessagesFragment : Fragment() {
-
-    // TODO: Rename and change types of parameters
-    private var mParam1: String? = null
-    private var mParam2: String? = null
 
     private var mListener: OnFragmentInteractionListener? = null
 
@@ -21,6 +22,21 @@ class MessagesFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_messages, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        messagesRecyclerView.layoutManager = LinearLayoutManager(activity)
+        messagesRecyclerView.addItemDecoration(DividerItemDecoration(activity, LinearLayoutManager.VERTICAL))
+
+        CleanerHolder.messages.observe(this, Observer { messagesList ->
+            if (messagesList == null) {
+                messagesRecyclerView.adapter = null
+                return@Observer
+            }
+            val adapter = MessagesAdapter(messagesList)
+            messagesRecyclerView.adapter = adapter
+        })
     }
 
     override fun onAttach(context: Context?) {
@@ -42,8 +58,7 @@ class MessagesFragment : Fragment() {
     companion object {
 
         fun newInstance(): MessagesFragment {
-            val fragment = MessagesFragment()
-            return fragment
+            return MessagesFragment()
         }
     }
-}// Required empty public constructor
+}

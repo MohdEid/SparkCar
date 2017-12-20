@@ -4,10 +4,12 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.app.ShareCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
+import kotlinx.android.synthetic.main.fragment_share.*
+import org.jetbrains.anko.support.v4.share
 
 
 class ShareFragment : Fragment() {
@@ -15,13 +17,27 @@ class ShareFragment : Fragment() {
 
     private var mListener: OnFragmentInteractionListener? = null
 
-    //TODO need to add functionality to the buttons
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_share, container, false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        btnFacebook.setOnClickListener {
+            ShareCompat.IntentBuilder.from(activity)
+                    .setChooserTitle("Share")
+                    .setType("text/plain")
+                    .setSubject("SparkCar")
+                    .setText("Hello from my amazing app for cleaning cars")
+                    .startChooser()
+        }
+        btnWhatsapp.setOnClickListener {
+            share("Hello", "SparkCar")
+        }
+    }
 
     fun onButtonPressed(uri: Uri) {
         if (mListener != null) {
@@ -52,8 +68,7 @@ class ShareFragment : Fragment() {
     companion object {
 
         fun newInstance(): ShareFragment {
-            val fragment = ShareFragment()
-            return fragment
+            return ShareFragment()
         }
     }
 }// Required empty public constructor

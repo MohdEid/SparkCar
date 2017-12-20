@@ -14,8 +14,6 @@ import com.example.notebookpc.sparkcar.adapters.FavoriteCleanersAdapter
 import com.example.notebookpc.sparkcarcommon.data.Id
 import kotlinx.android.synthetic.main.fragment_favorite.*
 
-// TODO add listener for clicking on items
-
 class FavoriteCleanersFragment : Fragment() {
 
 
@@ -23,7 +21,6 @@ class FavoriteCleanersFragment : Fragment() {
 
     private lateinit var favoritesList: List<Id>
 
-    //TODO fix problem with fragment doesn't load with empty favorites
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment

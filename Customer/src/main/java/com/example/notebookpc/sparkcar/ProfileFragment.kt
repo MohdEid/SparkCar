@@ -36,7 +36,7 @@ class ProfileFragment : Fragment() {
         val currentUser = CustomerHolder.customer
 
 
-        //TODO add a picture for the user to use
+        //TODO allow the user to add his picture to the profile
         currentUser.observe(this, Observer {
             val value = it ?: throw IllegalStateException()
             nameEditText.setText(value.name)

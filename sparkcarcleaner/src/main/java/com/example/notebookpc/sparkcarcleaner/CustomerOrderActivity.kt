@@ -9,6 +9,7 @@ import android.support.v4.content.FileProvider
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.example.notebookpc.sparkcarcommon.data.Customer
+import com.example.notebookpc.sparkcarcommon.data.Messages
 import com.example.notebookpc.sparkcarcommon.data.Orders
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -85,8 +86,24 @@ class CustomerOrderActivity : AppCompatActivity() {
                     val pictureUrl = it.result.downloadUrl.toString()
                     Log.d(LOGTAG, "order_id: ${orderTag.id}")
                     Log.d(LOGTAG, "orders: ${CleanerHolder.orders.value}")
+                    //TODO remove marker from the map and the order
                     val order = CleanerHolder.orders.value!!.first { it.orderId == orderTag.id }.copy(status = Orders.STATUS_COMPLETE, pictureUrl = pictureUrl)
-                    FirebaseDatabase.getInstance().getReference("/orders/${orderTag.id}").setValue(order.toMap())
+                    FirebaseDatabase.getInstance().getReference("/orders/${orderTag.id}").setValue(order.toMap()).addOnCompleteListener({ currentOrder ->
+                        if (currentOrder.isSuccessful) {
+                            val cleanerId = CleanerHolder.cleaner.value?.id ?: throw IllegalStateException()
+                            val message = Messages(title = "Task is completed", customerId = orderTag.customerId, content = "Your car is cleaned.", id = null, cleanerId = cleanerId)
+                            FirebaseDatabase.getInstance().getReference("/messages").push().setValue(message.toMap()).addOnCompleteListener { currentMessage ->
+                                if (currentMessage.isSuccessful) {
+                                    toast("Message has been sent")
+                                } else {
+                                    toast("Error: ${currentMessage.exception?.message}")
+                                }
+                            }
+
+                        } else {
+                            toast("Error: ${currentOrder.exception?.message}")
+                        }
+                    })
                     toast("Order completed successfully")
                     finish()
                 } else {

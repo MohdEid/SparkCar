@@ -7,24 +7,24 @@ import com.example.notebookpc.sparkcarcommon.data.Car
 import com.example.notebookpc.sparkcarcommon.data.Orders
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.database.FirebaseDatabase
-import kotlinx.android.synthetic.main.activity_orders.*
+import kotlinx.android.synthetic.main.activity_confirm_orders.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.toast
 
 
-class OrdersActivity : AppCompatActivity() {
+class ConfirmOrderActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_orders)
+        setContentView(R.layout.activity_confirm_orders)
 
         val cleaner = intent.extras.get("cleaner") as? MainActivity.CleanerTag ?: throw  IllegalStateException("Intent must have cleaner extra")
         cleanerName.text = cleaner.title
         CustomerHolder.customer.observe(this, android.arch.lifecycle.Observer { currentCustomer ->
             val locationAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, currentCustomer?.favoriteLocations?.map { it.name })
             locationSpinner.adapter = locationAdapter
-            val carAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, currentCustomer?.cars?.map { it.toString() })
+            val carAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, currentCustomer?.cars?.map { "${it.color} ${it.name},\t Plate#: ${it.carPlate}" })
             carSpinner.adapter = carAdapter
 
         })

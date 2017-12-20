@@ -33,7 +33,6 @@ class CarsFragment : Fragment() {
             startActivity<SaveCarActivity>()
         }
 
-        //TODO create listener on each car, to be able to delete or edit a car
         carsRcyclerView.layoutManager = LinearLayoutManager(activity)
         carsRcyclerView.addItemDecoration(DividerItemDecoration(activity, LinearLayoutManager.VERTICAL))
 

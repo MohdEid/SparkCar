@@ -57,13 +57,15 @@
                 <data android:scheme="@string/facebook_login_protocol_scheme"/>
             </intent-filter>
         </activity>
-        <activity android:name=".OrdersActivity"/>
+        <activity android:name=".ConfirmOrderActivity"/>
         <activity android:name=".SignUpActivity"/>
         <activity
             android:name=".PickLocationActivity"
             android:label="@string/title_activity_pick_location">
         </activity>
         <activity android:name=".SaveCarActivity">
+        </activity>
+        <activity android:name=".CarDetailsActivity">
         </activity>
     </application>
 

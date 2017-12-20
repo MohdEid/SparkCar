@@ -13,6 +13,7 @@ import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresPermission
 import android.support.design.widget.NavigationView
+import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -59,7 +60,8 @@ class MainActivity : AppCompatActivity(),
         CarsFragment.OnFragmentInteractionListener,
         AboutFragment.OnFragmentInteractionListener,
         ShareFragment.OnFragmentInteractionListener,
-        FragmentManager.OnBackStackChangedListener {
+        FragmentManager.OnBackStackChangedListener,
+        OrdersListFragment.OnFragmentInteractionListener {
 
     companion object {
         val REQUEST_LOCATION_CODE = 99
@@ -76,6 +78,7 @@ class MainActivity : AppCompatActivity(),
     internal val aboutFragment = AboutFragment.newInstance()
     internal val favoriteCleanersFragment: Fragment = FavoriteCleanersFragment.newInstance()
     internal val locationFragment = FavoriteLocationsFragment.newInstance()
+    internal val ordersListFragment = OrdersListFragment.newInstance()
     internal val mapFragment = SupportMapFragment.newInstance()
 
     //GoogleMaps Initialization
@@ -146,9 +149,6 @@ class MainActivity : AppCompatActivity(),
         //TODO need to fill Customer name and Mobile number in the Navigation Header
         navigationView = findViewById(R.id.navigation_view)
         navigationView.setNavigationItemSelectedListener(this)
-
-        // TODO remove this line
-//        updateSignOutItem()
 
         fused = LocationServices.getFusedLocationProviderClient(this)
 
@@ -399,7 +399,7 @@ class MainActivity : AppCompatActivity(),
                         startActivityForResult(signInIntent, RC_SIGN_IN)
                     } else {
                         //loads the activity when the user is present
-                        startActivity<OrdersActivity>("cleaner" to cleanerTag)
+                        startActivity<ConfirmOrderActivity>("cleaner" to cleanerTag)
                     }
                 }
                 negativeButton("Cancel") {}
@@ -513,18 +513,31 @@ class MainActivity : AppCompatActivity(),
                 if (resultCode == Activity.RESULT_OK) {
                     toast("Log in successful")
 
-                    val uid = firebaseAuth.currentUser?.uid ?: throw AssertionError()
-                    customersReference.child(uid).addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onCancelled(p0: DatabaseError?) {
-                            toast("There is an error")
-                        }
-
-                        override fun onDataChange(snapshot: DataSnapshot?) {
-                            if (snapshot == null || snapshot.value == null) {
-                                startActivityForResult<SignUpActivity>(RC_SIGN_UP, "id" to uid)
+                    if (!firebaseAuth.currentUser!!.isEmailVerified) {
+                        firebaseAuth.currentUser?.sendEmailVerification()?.addOnCompleteListener {
+                            if (it.isSuccessful) {
+                                val snackbar = Snackbar.make(drawerLayout, "Verify your email then sign in again", Snackbar.LENGTH_INDEFINITE)
+                                snackbar.setAction("Dismiss") {
+                                    snackbar.dismiss()
+                                }
+                                snackbar.show()
+                                CustomerHolder.signOut(this)
                             }
                         }
-                    })
+                    } else {
+                        val uid = firebaseAuth.currentUser?.uid ?: throw AssertionError()
+                        customersReference.child(uid).addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onCancelled(p0: DatabaseError?) {
+                                toast("There is an error")
+                            }
+
+                            override fun onDataChange(snapshot: DataSnapshot?) {
+                                if (snapshot == null || snapshot.value == null) {
+                                    startActivityForResult<SignUpActivity>(RC_SIGN_UP, "id" to uid)
+                                }
+                            }
+                        })
+                    }
                 } else {
                     toast("Log in failed")
                 }

@@ -45,9 +45,7 @@ class ShareFragment : Fragment() {
     companion object {
 
         fun newInstance(): ShareFragment {
-            val fragment = ShareFragment()
-
-            return fragment
+            return ShareFragment()
         }
     }
 }// Required empty public constructor
