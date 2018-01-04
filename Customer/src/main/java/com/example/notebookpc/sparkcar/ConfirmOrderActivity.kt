@@ -42,7 +42,9 @@ class ConfirmOrderActivity : AppCompatActivity() {
                     .forEach { currentLocation = it.location }
             val car = carSpinner.selectedItem.toString()
             val carDetail = CustomerHolder.customer.value?.cars ?: throw  IllegalStateException()
-            lateinit var carInfo: Car
+
+            //TODO CarInfo isn't initialized properly
+            var carInfo: Car? = null
             carDetail
                     .filter { it.toString() == car }
                     .forEach { carInfo = it }
@@ -51,7 +53,7 @@ class ConfirmOrderActivity : AppCompatActivity() {
             val order = Orders(
                     cleanerId = cleaner.id,
                     location = currentLocation,
-                    car = carInfo,
+                    car = carInfo!!,
                     customerId = customerId,
                     orderId = null,
                     status = Orders.STATUS_INCOMPLETE,
