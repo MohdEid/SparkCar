@@ -28,6 +28,7 @@ internal class MessagesAdapter(private val messages: List<Messages>) : RecyclerV
 
 internal class MessagesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
+    // TODO add title to itemView layout
     lateinit var customerReference: DatabaseReference
     val fromCustomerTextView: TextView = itemView.findViewById(R.id.fromCustomerTextView)
     val titleFromCustomerTextView: TextView = itemView.findViewById(R.id.titleFromCustomerTextView)
@@ -53,7 +54,7 @@ internal class MessagesViewHolder(itemView: View) : RecyclerView.ViewHolder(item
         }
         customerReference.addListenerForSingleValueEvent(customerListener)
 
-        titleFromCustomerTextView.text = messages.title
+        titleFromCustomerTextView.text = messages.content
         dateTextView.text = messages.date.toString(DateTimeFormat.mediumDateTime())
     }
 }

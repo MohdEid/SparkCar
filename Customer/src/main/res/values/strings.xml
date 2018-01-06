@@ -78,4 +78,8 @@
     <string name="reset_password">Reset Password</string>
     <string name="from">From:</string>
     <string name="enter_location_name">Enter location name:</string>
+    <string name="message">Message:</string>
+    <string name="send">Send</string>
+    <string name="to">To:</string>
+    <string name="title">Title:</string>
 </resources>

@@ -40,7 +40,6 @@ class ConfirmOrderActivity : AppCompatActivity() {
             locations
                     .filter { it.name == locationName }
                     .forEach { currentLocation = it.location }
-            val car = carSpinner.selectedItem.toString()
             val carDetail = CustomerHolder.customer.value?.cars ?: throw  IllegalStateException()
 
             val carInfo: Car = carDetail[carSpinner.selectedItemPosition]

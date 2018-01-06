@@ -5,10 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.example.notebookpc.sparkcar.NewMessageActivity
 import com.example.notebookpc.sparkcar.R
 import com.example.notebookpc.sparkcarcommon.data.Cleaner
+import com.example.notebookpc.sparkcarcommon.data.Id
 import com.example.notebookpc.sparkcarcommon.data.Messages
 import com.google.firebase.database.*
+import org.jetbrains.anko.startActivity
 import org.joda.time.format.DateTimeFormat
 
 internal class MessagesAdapter(private val messages: List<Messages>) : RecyclerView.Adapter<MessagesViewHolder>() {
@@ -28,16 +31,24 @@ internal class MessagesAdapter(private val messages: List<Messages>) : RecyclerV
     }
 }
 
-class MessagesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+internal class MessagesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    lateinit var cleanerReference: DatabaseReference
-    val fromCleanerTextView: TextView = itemView.findViewById(R.id.fromCleanerTextView)
-    val titleFromCleanerTextView: TextView = itemView.findViewById(R.id.titleFromCleanerTextView)
-    val dateTextView: TextView = itemView.findViewById(R.id.dateTextView)
-
-
+    // TODO add title to itemView layout
+    private lateinit var cleanerReference: DatabaseReference
     private var cleanerListener: ValueEventListener? = null
+    private var cleanerId: Id? = null
+    private val fromCleanerTextView: TextView = itemView.findViewById(R.id.fromCleanerTextView)
+    private val titleFromCleanerTextView: TextView = itemView.findViewById(R.id.titleFromCleanerTextView)
+    private val dateTextView: TextView = itemView.findViewById(R.id.dateTextView)
+
+    init {
+        itemView.setOnClickListener {
+            itemView.context.startActivity<NewMessageActivity>("cleanerId" to cleanerId)
+        }
+    }
+
     fun bind(messages: Messages) {
+        cleanerId = messages.cleanerId
 
         if (cleanerListener != null) {
             cleanerReference.removeEventListener(cleanerListener)
@@ -55,7 +66,7 @@ class MessagesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         }
         cleanerReference.addListenerForSingleValueEvent(cleanerListener)
 
-        titleFromCleanerTextView.text = messages.title
+        titleFromCleanerTextView.text = messages.content
         dateTextView.text = messages.date.toString(DateTimeFormat.mediumDateTime())
     }
 }

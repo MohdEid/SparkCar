@@ -67,6 +67,8 @@
         </activity>
         <activity android:name=".CarDetailsActivity">
         </activity>
+        <activity android:name=".NewMessageActivity">
+        </activity>
     </application>
 
 </manifest>

@@ -30,7 +30,7 @@ class SignUpActivity : AppCompatActivity() {
 
 
         //TODO do expression check before signing up
-        submitButton.onClick {
+        sendButton.onClick {
             val name = nameEditText.text.toString().let {
                 if (it.isBlank()) {
                     toast("Please enter your name")
