@@ -43,17 +43,13 @@ class ConfirmOrderActivity : AppCompatActivity() {
             val car = carSpinner.selectedItem.toString()
             val carDetail = CustomerHolder.customer.value?.cars ?: throw  IllegalStateException()
 
-            //TODO CarInfo isn't initialized properly
-            var carInfo: Car? = null
-            carDetail
-                    .filter { it.toString() == car }
-                    .forEach { carInfo = it }
+            val carInfo: Car = carDetail[carSpinner.selectedItemPosition]
 
             val customerId = CustomerHolder.customer.value?.id ?: throw IllegalStateException()
             val order = Orders(
                     cleanerId = cleaner.id,
                     location = currentLocation,
-                    car = carInfo!!,
+                    car = carInfo,
                     customerId = customerId,
                     orderId = null,
                     status = Orders.STATUS_INCOMPLETE,
