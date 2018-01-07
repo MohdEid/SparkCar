@@ -72,6 +72,8 @@
                 android:resource="@xml/file_paths"/>
         </provider>
 
+        <activity android:name=".NewMessageActivity">
+        </activity>
     </application>
 
 </manifest>

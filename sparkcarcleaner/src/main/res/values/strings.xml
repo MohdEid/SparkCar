@@ -51,4 +51,6 @@
     <string name="title">Title</string>
     <string name="your_message_here">Your Message here</string>
     <string name="send_message">Send Message</string>
+    <string name="message">Message:</string>
+    <string name="send">Send</string>
 </resources>
